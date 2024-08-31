@@ -43,7 +43,7 @@
     "resend": "^3.5.0",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "xlsx": "^0.18.5"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

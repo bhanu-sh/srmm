@@ -4,6 +4,6 @@ import Fee from "./feeModel";
 import Student from "./studentModel";
 import User from "./userModel";
 import Subject from "./subjectModel";
-import Settings from "./settingsModel";
+import Setting from "./settingModel";
 
-export { Course, Expense, Fee, Student, User, Subject, Settings };
+export { Course, Expense, Fee, Student, User, Subject, Setting };
