@@ -64,6 +64,7 @@ export default function CollegeDashboard() {
   const [pendingFees, setPendingFees] = useState(0);
   const [expenses, setExpenses] = useState(0);
   const [disabled, setDisabled] = useState(true);
+  const [settings, setSettings] = useState([]);
   const [newExpense, setNewExpense] = useState(initialExpenseState);
   const [payFee, setPayFee] = useState({
     name: "Fee Payment",
@@ -199,7 +200,9 @@ export default function CollegeDashboard() {
           <h1 className="text-2xl text-center font-semibold">
             Welcome, {`${session.user.name}`}
           </h1>
-          <h1 className="text-lg text-center font-semibold text-red-600">SHRI RAJROOP MEMORIAL MAHAVIDYALAYA</h1>
+          <h1 className="text-lg text-center font-semibold text-red-600">
+            SHRI RAJROOP MEMORIAL MAHAVIDYALAYA
+          </h1>
           <div className="flex flex-col justify-center py-5 border-y-2 border-gray-300">
             <h2 className="text-3xl font-bold text-center">Stats:</h2>
             <div className="flex flex-wrap justify-around">
@@ -207,18 +210,18 @@ export default function CollegeDashboard() {
                 title="Students"
                 count={students.length}
                 isLoading={StudentLoading}
-                link="/dashboard/students"
+                link="/students"
               />
               <CountCard
                 title="Courses"
                 count={course.length}
-                link="/dashboard/courses"
+                link="/courses"
                 isLoading={CourseLoading}
               />
               <CountCard
                 title="Staffs"
                 count={staffs.length}
-                link="/dashboard/staffs"
+                link="/staffs"
                 isLoading={StaffLoading}
               />
             </div>
@@ -449,12 +452,12 @@ export default function CollegeDashboard() {
               <ExpenseCard
                 title="Spent"
                 amount={formatCurrency(expenses)}
-                link="/dashboard/expenses"
+                link="/expenses"
               />
               <ExpenseCard
                 title="Pending Fees"
                 amount={formatCurrency(pendingFees)}
-                link="/dashboard/fees"
+                link="/fees"
               />
             </div>
           </div>
