@@ -1,7 +1,7 @@
 import { connect } from "@/dbConfig/dbConfig";
 import { Student } from "@/models";
 import { Fee } from "@/models";
-import { Course } from "@/models";
+import { Session } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
@@ -11,8 +11,7 @@ export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
     const {
-      f_name,
-      l_name,
+      name,
       father_name,
       mother_name,
       email,
@@ -26,9 +25,7 @@ export async function POST(request: NextRequest) {
       roll,
       aadhar,
       course,
-      session_start_year,
-      session_end_year,
-      college_id,
+      session,
     } = reqBody;
 
     console.log(reqBody);
@@ -49,8 +46,7 @@ export async function POST(request: NextRequest) {
 
     // Create new Student
     const newStudent = new Student({
-      f_name,
-      l_name,
+      name,
       father_name,
       mother_name,
       email,
@@ -60,14 +56,12 @@ export async function POST(request: NextRequest) {
       address,
       city,
       state,
-      college_id: college_id,
       password: hashedPassword,
       role: "Student",
       roll_no: roll,
       aadhar,
       course,
-      session_start_year,
-      session_end_year,
+      session,
     });
 
     const savedStudent = await newStudent.save();
@@ -80,32 +74,19 @@ export async function POST(request: NextRequest) {
       amount: 0,
       type: "fee",
       receipt_no: course_receipt_no,
-      college_id,
       student_id: savedStudent._id,
     });
     await newCourseFee.save();
 
-    const paid_receipt_no = (await Fee.countDocuments({})) + 1;
+    savedStudent.fees.push(newCourseFee._id);
 
-    const newPaidFee = new Fee({
-      name: "Paid Fee",
-      description: "Paid Fee",
-      amount: 0,
-      receipt_no: paid_receipt_no,
-      type: "received",
-      college_id,
-      student_id: savedStudent._id,
-    });
-    await newPaidFee.save();
-
-    savedStudent.fees.push(newCourseFee._id, newPaidFee._id);
     await savedStudent.save();
 
-    // Update Course
-    const courseDetails = await Course.findOne({_id: course});
-    courseDetails.students.push(savedStudent._id);
+    // Update Session
+    const sessionDetails = await Session.findOne({ _id: session });
+    sessionDetails.students.push(savedStudent._id);
 
-    await courseDetails.save();
+    await sessionDetails.save();
 
     return NextResponse.json({
       message: "Student addedd successfully",

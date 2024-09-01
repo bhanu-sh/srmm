@@ -18,11 +18,9 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function StudentTable({
-  collegeId,
   role,
   lock,
 }: {
-  collegeId: string;
   role: string;
   lock: boolean;
 }) {
@@ -34,10 +32,7 @@ export default function StudentTable({
 
   const getStudents = async () => {
     try {
-      console.log(collegeId);
-      const response = await axios.post(`/api/student/getbycollege`, {
-        college_id: collegeId,
-      });
+      const response = await axios.get("/api/student/getall");
       setUser(response.data.data);
       setSearchResults(response.data.data); // Initialize search results with all students
     } catch (error: any) {
@@ -106,8 +101,7 @@ export default function StudentTable({
   const searchUser = (query: string) => {
     const results = user.filter((user: any) => {
       return (
-        user.f_name?.toLowerCase().includes(query.toLowerCase()) ||
-        user.l_name?.toLowerCase().includes(query.toLowerCase()) ||
+        user.name?.toLowerCase().includes(query.toLowerCase()) ||
         user.phone?.toLowerCase().includes(query.toLowerCase()) ||
         user.email?.toLowerCase().includes(query.toLowerCase()) ||
         user.course?.name?.toLowerCase().includes(query.toLowerCase()) ||
@@ -158,7 +152,7 @@ export default function StudentTable({
           Students
         </h1>
         <div className="flex justify-between mb-4">
-          <Link href="/dashboard/add/student">
+          <Link href="/add/student">
             <button className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-700">
               Add Student
             </button>
@@ -307,7 +301,7 @@ export default function StudentTable({
                     />
                   </td>
                   <td className="px-6 py-4 bg-gray-50">
-                    {user.f_name} {user.l_name}
+                    {user.name}
                   </td>
                   <td className="px-6 py-4">
                     {new Date(user.dob).toLocaleDateString(undefined, {
@@ -325,7 +319,7 @@ export default function StudentTable({
                   <td className="px-6 py-3 flex flex-col">
                     <Link
                       className="mb-2"
-                      href={`/dashboard/students/${user._id}`}
+                      href={`/students/${user._id}`}
                     >
                       <button className="bg-green-500 w-full hover:bg-green-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-green-400">
                         View

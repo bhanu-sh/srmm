@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Fee } from "@/models";
+import { Session } from "@/models";
 import { connect } from "@/dbConfig/dbConfig";
 
 connect();
@@ -18,19 +18,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const user = await Fee.findById(id)
-      .populate("student_id", "f_name l_name course")
+    const session = await Session.findById(id);
 
-    if (!user) {
-      return NextResponse.json({ error: "Fee not found" }, { status: 404 });
+    if (!session) {
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
 
     return NextResponse.json({
-      message: "Fee Found",
-      data: user,
+      message: "Session Found",
+      data: session,
     });
   } catch (error: any) {
-    console.error("Error finding Fee details:", error.message);
+    console.error("Error finding Session details:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

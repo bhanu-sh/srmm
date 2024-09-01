@@ -51,11 +51,9 @@ const initialExpenseState = {
 
 export default function CollegeDashboard() {
   const { data: session } = useSession();
-  const [college, setCollege] = useState<College | null>(null);
   const [students, setStudents] = useState([]);
   const [staffs, setStaffs] = useState([]);
   const [course, setCourse] = useState([]);
-  const [collegeLoading, setCollegeLoading] = useState(false);
   const [StudentLoading, setStudentLoading] = useState(false);
   const [StaffLoading, setStaffLoading] = useState(false);
   const [CourseLoading, setCourseLoading] = useState(false);
@@ -71,44 +69,21 @@ export default function CollegeDashboard() {
     amount: "",
     method: "cash",
     student_id: "",
-    college_id: "",
   });
 
   const handleFetchData = async () => {
-    setCollegeLoading(true);
     setStudentLoading(true);
     setStaffLoading(true);
     setCourseLoading(true);
     try {
-      const [
-        collegeRes,
-        studentsRes,
-        feesRes,
-        staffsRes,
-        expensesRes,
-        courseRes,
-      ] = await Promise.all([
-        axios.post(`/api/college/getbyid`, {
-          college_id: session?.user.college_id,
-        }),
-        axios.post(`/api/student/getbycollege`, {
-          college_id: session?.user.college_id,
-        }),
-        axios.post(`/api/fee/getbycollege`, {
-          college_id: session?.user.college_id,
-        }),
-        axios.post(`/api/user/staff/getbycollege`, {
-          college_id: session?.user.college_id,
-        }),
-        axios.post(`/api/expense/getbycollege`, {
-          college_id: session?.user.college_id,
-        }),
-        axios.post(`/api/course/getbycollege`, {
-          college_id: session?.user.college_id,
-        }),
-      ]);
-
-      setCollege(collegeRes.data);
+      const [studentsRes, feesRes, staffsRes, expensesRes, courseRes] =
+        await Promise.all([
+          axios.get(`/api/student/getall`),
+          axios.get(`/api/fee/getall`),
+          axios.get(`/api/user/staff/getall`),
+          axios.get(`/api/expense/getall`),
+          axios.get(`/api/course/getall`),
+        ]);
       setStudents(studentsRes.data.data);
       setStaffs(staffsRes.data.data);
       setCourse(courseRes.data.data);
@@ -130,7 +105,6 @@ export default function CollegeDashboard() {
       setError(error.response.data.error);
       console.log("Error", error.response.data.error);
     }
-    setCollegeLoading(false);
     setStudentLoading(false);
     setStaffLoading(false);
     setCourseLoading(false);
@@ -139,7 +113,6 @@ export default function CollegeDashboard() {
   const handleAddExpense = async () => {
     try {
       await axios.post(`/api/expense/add`, {
-        college_id: session?.user.college_id,
         ...newExpense,
       });
       toast.success("Expense Added Successfully");
@@ -151,11 +124,10 @@ export default function CollegeDashboard() {
     }
   };
 
-  const payingFee = async (studentId: string, collegeId: string) => {
+  const payingFee = async (studentId: string) => {
     try {
       const updatedPayFee = {
         ...payFee,
-        college_id: collegeId,
         student_id: studentId,
       };
       setPayFee(updatedPayFee);
@@ -179,10 +151,8 @@ export default function CollegeDashboard() {
   };
 
   useEffect(() => {
-    if (session?.user.college_id) {
-      if (!college || !students.length || !staffs.length || !course.length) {
-        handleFetchData();
-      }
+    if (!students.length || !staffs.length || !course.length) {
+      handleFetchData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
@@ -229,7 +199,6 @@ export default function CollegeDashboard() {
           <hr />
           <div className="flex justify-center gap-8 items-end py-5 border-b-2 border-gray-300">
             <h2 className="text-3xl font-bold">Lock Status:</h2>
-            <CollegeLock collegeId={String(session.user.college_id)} />
           </div>
           <hr />
           <div className="flex flex-col justify-center py-5 border-b-2 border-gray-300">
@@ -423,10 +392,7 @@ export default function CollegeDashboard() {
                                                 <Button
                                                   variant={"info"}
                                                   onClick={() => {
-                                                    payingFee(
-                                                      student._id,
-                                                      student.college_id
-                                                    );
+                                                    payingFee(student._id);
                                                   }}
                                                 >
                                                   Pay Fee

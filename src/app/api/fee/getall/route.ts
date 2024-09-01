@@ -6,7 +6,7 @@ connect();
 
 export async function GET(request: NextRequest) {
   try {
-    const fees = await Fee.find();
+    const fees = await Fee.find().populate("student_id");
     return NextResponse.json({ data: fees });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

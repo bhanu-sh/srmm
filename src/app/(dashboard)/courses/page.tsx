@@ -40,9 +40,7 @@ export default function CoursesPage() {
   const handleFetchData = async () => {
     setLoading(true);
     try {
-      const res = await axios.post(`/api/course/getbycollege`, {
-        college_id: session?.user.college_id,
-      });
+      const res = await axios.get(`/api/course/getall`);
       console.log(res.data.data);
       setCourses(res.data.data);
     } catch (error: any) {
@@ -56,7 +54,6 @@ export default function CoursesPage() {
     setLoading(true);
     try {
       await axios.post(`/api/course/add`, {
-        college_id: session?.user.college_id,
         name: addedCourse.name,
         duration: addedCourse.duration,
       });

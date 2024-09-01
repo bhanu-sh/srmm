@@ -1,27 +1,17 @@
 import { connect } from "@/dbConfig/dbConfig";
 import Expense from "@/models/expenseModel";
-import College from "@/models/collegeModel";
 import { NextRequest, NextResponse } from "next/server";
 
 connect();
 
 export async function POST(request: NextRequest) {
   try {
-    const { expense_id, college_id } = await request.json();
+    const { expense_id } = await request.json();
 
-    if (!expense_id || !college_id) {
+    if (!expense_id) {
       return NextResponse.json(
         { error: "Invalid or empty Expense ID or College ID provided" },
         { status: 400 }
-      );
-    }
-
-    const college = await College.findById(college_id);
-
-    if (!college) {
-      return NextResponse.json(
-        { error: "College not found with provided ID" },
-        { status: 404 }
       );
     }
 
@@ -35,12 +25,6 @@ export async function POST(request: NextRequest) {
     }
 
     await Expense.findByIdAndDelete(expense_id);
-
-    college.expenses = college.expenses.filter(
-      (exp: string) => exp !== expense_id
-    );
-
-    await college.save();
 
     return NextResponse.json({ message: "Expense deleted successfully" });
   } catch (error: any) {

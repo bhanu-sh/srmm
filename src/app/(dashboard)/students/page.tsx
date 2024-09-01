@@ -2,9 +2,6 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import axios from "axios";
-import Link from "next/link";
-import toast from "react-hot-toast";
-import { jsonToExcel } from "@/helpers/jsonToExcel";
 import StudentTable from "@/app/components/StudentTable";
 
 export default function StudentsPage() {
@@ -27,17 +24,13 @@ export default function StudentsPage() {
     if (session?.user.college_id) {
       fetchCollege();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   return (
     <>
       {session && (
-        <StudentTable
-          collegeId={String(session.user.college_id)}
-          role={String(session.user.role)}
-          lock={college?.lock}
-        />
+        <StudentTable role={String(session.user.role)} lock={college?.lock} />
       )}
     </>
   );

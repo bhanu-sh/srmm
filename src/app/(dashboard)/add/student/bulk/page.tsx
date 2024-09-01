@@ -29,19 +29,13 @@ export default function AddStudents() {
 
   const getCourses = async () => {
     try {
-      if (!session?.user?.college_id) {
-        console.warn("No college ID found in session.");
-        return;
-      }
-
-      const response = await axios.post("/api/course/getbycollege", {
-        college_id: session.user.college_id,
-      });
+      const response = await axios.get("/api/course/getall");
       console.log("Courses response:", response.data);
 
       if (response.data && Array.isArray(response.data.data)) {
         setCourse(response.data.data);
         setCourseId(response.data.data[0]._id);
+        console.log("Course Id:", response.data.data[0]._id);
       } else {
         console.error("Unexpected response format:", response.data);
       }

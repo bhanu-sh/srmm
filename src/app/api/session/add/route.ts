@@ -1,5 +1,5 @@
 import { connect } from "@/dbConfig/dbConfig";
-import Course from "@/models/courseModel";
+import { Session } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 
 connect();
@@ -7,25 +7,26 @@ connect();
 export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
-    const { name, duration } = reqBody;
+    const { start, end, courseId } = reqBody;
 
     console.log(reqBody);
 
-    // Create new Course
-    const newCourse = new Course({
-      name,
-      duration,
+    // Create new Session
+    const newSession = new Session({
+      start,
+      end,
+      course: courseId,
       students: [],
     });
 
-    // Save Course
-    const savedCourse = await newCourse.save();
-    console.log(savedCourse);
+    // Save Session
+    const savedSession = await newSession.save();
+    console.log(savedSession);
 
     return NextResponse.json({
-      message: "Fee created successfully",
+      message: "Session created successfully",
       success: true,
-      savedCourse,
+      savedSession,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

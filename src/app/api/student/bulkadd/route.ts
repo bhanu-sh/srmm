@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
     console.log("Request body:", reqBody);
-    const { user, college_id, course_id } = reqBody;
+    const { user, course_id } = reqBody;
 
     if (!Array.isArray(user) || user.length === 0) {
       return NextResponse.json(
@@ -30,8 +30,7 @@ export async function POST(request: NextRequest) {
 
     for (const student of user) {
       const {
-        f_name,
-        l_name,
+        name,
         father_name,
         mother_name,
         email,
@@ -86,8 +85,7 @@ export async function POST(request: NextRequest) {
 
         // Create new student
         const newStudent = new Student({
-          f_name,
-          l_name,
+          name,
           father_name,
           mother_name,
           email,
@@ -98,7 +96,6 @@ export async function POST(request: NextRequest) {
           city,
           state,
           pincode,
-          college_id,
           password: hashedPassword,
           role: "Student",
           roll_no: roll,
@@ -119,7 +116,6 @@ export async function POST(request: NextRequest) {
           amount: course_fee,
           type: "fee",
           receipt_no: receipt_no,
-          college_id,
           student_id: savedStudent._id,
         });
 

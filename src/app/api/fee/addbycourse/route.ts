@@ -8,9 +8,9 @@ connect();
 export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
-    const { course, college_id, name, amount } = reqBody;
+    const { course, name, amount } = reqBody;
 
-    const students = await Student.find({ college_id }).populate("course");
+    const students = await Student.find().populate("course");
 
     const filteredStudents = students.filter(
       (student) => student.course.name === course
@@ -18,12 +18,11 @@ export async function POST(request: NextRequest) {
 
     for (const student of filteredStudents) {
       const fee = new Fee({
-        college_id,
-        student_id: student._id,
+        receipt_no: (await Fee.countDocuments({})) + 1,
         name,
         amount,
         type: "fee",
-        receipt_no: Math.floor(100000 + Math.random() * 900000),
+        student_id: student._id,
       });
 
       await fee.save();

@@ -1,13 +1,13 @@
 import { connect } from "@/dbConfig/dbConfig";
-import { Student } from "@/models";
+import { Expense } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 
 connect();
 
 export async function GET(request: NextRequest) {
   try {
-    const students = await Student.find().populate("course");
-    return NextResponse.json({ data: students });
+    const expenses = await Expense.find();
+    return NextResponse.json({ data: expenses });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

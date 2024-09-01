@@ -10,8 +10,7 @@ interface Fee {
   _id: string;
   student_id?: {
     _id: any;
-    f_name: string;
-    l_name: string;
+    name: string;
     course: string;
   };
   amount: number;
@@ -21,11 +20,9 @@ interface Fee {
   [key: string]: any;
 }
 
-const fetchFees = async (collegeId: string) => {
+const fetchFees = async () => {
   try {
-    const res = await axios.post("/api/fee/getbycollege", {
-      college_id: collegeId,
-    });
+    const res = await axios.get("/api/fee/getall");
     return res.data.data;
   } catch (error: any) {
     throw new Error(error.response.data.error || "Failed to fetch fees");
@@ -52,14 +49,15 @@ const TableHeader: React.FC<{ onSort: (key: string) => void }> = ({
         Date
       </th>
       <th className="px-4 py-2 bg-white">Student Name</th>
-      <th className="px-4 py-2 bg-blue-100 cursor-pointer">Method</th>
+      <th className="px-4 py-2 bg-blue-100 cursor-pointer">Description</th>
+      <th className="px-4 py-2 bg-white cursor-pointer">Method</th>
       <th
-        className="px-4 py-2 cursor-pointer bg-white"
+        className="px-4 py-2 cursor-pointer bg-blue-100"
         onClick={() => onSort("amount")}
       >
         Amount
       </th>
-      <th className="px-4 py-2 bg-blue-100">Action</th>
+      <th className="px-4 py-2 bg-white">Action</th>
     </tr>
   </thead>
 );
@@ -82,9 +80,9 @@ const FeesPage: React.FC = () => {
   const [totalAmount, setTotalAmount] = useState<number>(0);
 
   const fetchData = useCallback(async () => {
-    if (session?.user.college_id) {
+    if (session) {
       try {
-        const data = await fetchFees(session.user.college_id);
+        const data = await fetchFees();
         setFees(data.filter((fee: Fee) => fee.type === "received"));
       } catch (error: any) {
         setError(error.message);
@@ -202,19 +200,18 @@ const FeesPage: React.FC = () => {
                   <td className="px-4 py-2 bg-white">
                     <Link
                       className="mb-2"
-                      href={`/dashboard/students/${fee.student_id?._id}`}
+                      href={`/students/${fee.student_id?._id}`}
                     >
-                      <button>
-                        {fee.student_id?.f_name} {fee.student_id?.l_name}
-                      </button>
+                      <button>{fee.student_id?.name}</button>
                     </Link>
                   </td>
-                  <td className="px-4 py-2 bg-blue-100 ">{fee.method}</td>
-                  <td className="px-4 py-2 bg-white">
+                  <td className="px-4 py-2 bg-blue-100 ">{fee.description}</td>
+                  <td className="px-4 py-2 bg-white ">{fee.method}</td>
+                  <td className="px-4 py-2 bg-blue-100">
                     {formatCurrency(fee.amount)}
                   </td>
-                  <td className="px-4 py-2 bg-blue-100">
-                    <Link href={`/dashboard/fees/${fee._id}`}>
+                  <td className="px-4 py-2 bg-white">
+                    <Link href={`/fees/${fee._id}`}>
                       <Button variant={"link"}>View</Button>
                     </Link>
                   </td>

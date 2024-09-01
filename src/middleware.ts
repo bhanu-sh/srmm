@@ -8,8 +8,8 @@ export default withAuth(
       return NextResponse.next();
     } else {
       if (
-        (req.nextUrl.pathname.startsWith("/dashboard/add/college") ||
-          req.nextUrl.pathname.startsWith("/dashboard/add/staff")) &&
+        (req.nextUrl.pathname.startsWith("/add/college") ||
+          req.nextUrl.pathname.startsWith("/add/staff")) &&
         req.nextauth.token?.role !== "CollegeAdmin"
       ) {
         return NextResponse.redirect(new URL("/unauthorized", req.url));

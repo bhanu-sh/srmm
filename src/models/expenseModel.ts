@@ -18,11 +18,7 @@ const expenseSchema = new mongoose.Schema(
       enum: ["sent", "received"],
       required: true,
     },
-    college_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "colleges",
-      required: true,
-    },
+
     date: {
       type: Date,
       default: Date.now,

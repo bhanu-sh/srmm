@@ -26,11 +26,6 @@ const feeSchema = new mongoose.Schema(
       type: String,
       enum: ["cash", "cheque", "online"],
     },
-    college_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "colleges",
-      required: true,
-    },
     student_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "students",

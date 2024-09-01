@@ -21,10 +21,6 @@ interface Expense {
   description: string;
   amount: number;
   type: "sent" | "received";
-  college_id: {
-    id: string;
-    lock: boolean;
-  };
   date: string;
   createdAt: string;
   updatedAt: string;
@@ -36,11 +32,10 @@ interface AggregatedExpense {
   amount: number;
 }
 
-const fetchExpenses = async (collegeId: string) => {
+const fetchExpenses = async () => {
   try {
-    const res = await axios.post("/api/expense/getbycollege", {
-      college_id: collegeId,
-    });
+    const res = await axios.get("/api/expense/getall");
+    console.log("Response data:", res.data);
     return res.data.data;
   } catch (error: any) {
     throw new Error(error.response.data.error || "Failed to fetch expenses");
@@ -109,15 +104,13 @@ const ExpensesPage: React.FC = () => {
   const [totalAmount, setTotalAmount] = useState<number>(0);
 
   const fetchData = useCallback(async () => {
-    if (session?.user.college_id) {
-      try {
-        const data = await fetchExpenses(session.user.college_id);
-        setExpenses(data);
-      } catch (error: any) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
+    try {
+      const data = await fetchExpenses();
+      setExpenses(data);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   }, [session]);
 
@@ -173,7 +166,6 @@ const ExpensesPage: React.FC = () => {
     try {
       const res = await axios.post("/api/expense/delete", {
         expense_id: expenseId,
-        college_id: session?.user.college_id,
       });
       console.log("Response data:", res.data);
       fetchData();
@@ -290,7 +282,7 @@ const ExpensesPage: React.FC = () => {
                           <td className="px-4 py-2 bg-slate-300">
                             <button
                               onClick={() => onDelete(expense._id)}
-                              disabled={expense.college_id.lock}
+                              disabled={loading}
                               className="text-red-500"
                             >
                               Delete

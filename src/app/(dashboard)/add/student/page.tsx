@@ -12,8 +12,7 @@ export default function AddStudent() {
 
   const router = useRouter();
   const [student, setStudent] = useState({
-    f_name: "",
-    l_name: "",
+    name: "",
     father_name: "",
     mother_name: "",
     email: "",
@@ -27,8 +26,7 @@ export default function AddStudent() {
     roll: "",
     aadhar: "",
     course: "",
-    session_start_year: "",
-    session_end_year: "",
+    session: "",
   });
   const [collegeLock, setCollegeLock] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
@@ -50,14 +48,7 @@ export default function AddStudent() {
 
   const getCourses = async () => {
     try {
-      if (!session?.user?.college_id) {
-        console.warn("No college ID found in session.");
-        return;
-      }
-
-      const response = await axios.post("/api/course/getbycollege", {
-        college_id: session.user.college_id,
-      });
+      const response = await axios.get("/api/course/getall");
       console.log("Courses response:", response.data);
 
       if (response.data && Array.isArray(response.data.data)) {
@@ -80,7 +71,7 @@ export default function AddStudent() {
       });
       console.log("Student Added Successfully", response.data);
       toast.success("Student Added");
-      router.push("/dashboard");
+      router.push("/");
     } catch (error: any) {
       console.log("Adding failed", error.response.data.error);
     } finally {
@@ -96,21 +87,10 @@ export default function AddStudent() {
 
   useEffect(() => {
     if (
-      student.f_name.length > 0 &&
-      student.l_name.length > 0 &&
-      student.father_name.length > 0 &&
-      student.mother_name.length > 0 &&
+      student.name.length > 0 &&
       student.phone.length > 0 &&
-      student.dob.length > 0 &&
-      student.gender.length > 0 &&
-      student.address.length > 0 &&
-      student.city.length > 0 &&
-      student.state.length > 0 &&
-      student.pincode.length > 0 &&
-      student.aadhar.length > 0 &&
       student.course.length > 0 &&
-      student.session_start_year.length > 0 &&
-      student.session_end_year.length > 0
+      student.session.length > 0
     ) {
       setButtonDisabled(false);
     } else {
@@ -147,35 +127,23 @@ export default function AddStudent() {
           <hr />
           <div className="flex justify-around items-center">
             <p>Add using Excel?</p>
-            <Link className="" href={"/dashboard/add/student/bulk"}>
+            <Link className="" href={"/add/student/bulk"}>
               <button className="p-2 border mt-3 border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 hover:bg-gray-200">
                 Bulk Add
               </button>
             </Link>
           </div>
           <hr />
-          <label htmlFor="name">First Name</label>
+          <label htmlFor="name">Name</label>
           <input
             className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
             id="name"
             type="text"
             required
-            value={student.f_name}
+            value={student.name}
             placeholder="Name"
             onChange={(e) => {
-              setStudent({ ...student, f_name: e.target.value });
-            }}
-          />
-          <label htmlFor="name">Last Name</label>
-          <input
-            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-            id="name"
-            type="text"
-            required
-            value={student.l_name}
-            placeholder="Name"
-            onChange={(e) => {
-              setStudent({ ...student, l_name: e.target.value });
+              setStudent({ ...student, name: e.target.value });
             }}
           />
           <label htmlFor="father_name">Father&apos;s Name</label>
@@ -290,14 +258,15 @@ export default function AddStudent() {
             }
           />
           <label htmlFor="roll">Roll Number</label>
-          <input
-            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-            id="roll"
-            type="text"
-            value={student.roll}
-            placeholder="Roll Number"
-            onChange={(e) => setStudent({ ...student, roll: e.target.value })}
-          />
+          <div className="flex flex-row items-center rounded-md">
+            <span className="font-bold pb-4 mr-1">SRMM</span>
+            <input
+              placeholder="Search Student"
+              className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
+              value={student.roll}
+              onChange={(e) => setStudent({ ...student, roll: e.target.value })}
+            />
+          </div>
           <label htmlFor="aadhar">Aadhar Number</label>
           <input
             className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
@@ -333,28 +302,16 @@ export default function AddStudent() {
               </select>
             )}
           </div>
-          <label htmlFor="session_start_year">Session Start Year</label>
+          <label htmlFor="session">Session</label>
           <input
             className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-            id="session_start_year"
+            id="session"
             type="text"
             required
-            value={student.session_start_year}
+            value={student.session}
             placeholder="Session Start Year"
             onChange={(e) =>
-              setStudent({ ...student, session_start_year: e.target.value })
-            }
-          />
-          <label htmlFor="session_end_year">Session End Year</label>
-          <input
-            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-            id="session_end_year"
-            type="text"
-            required
-            value={student.session_end_year}
-            placeholder="Session End Year"
-            onChange={(e) =>
-              setStudent({ ...student, session_end_year: e.target.value })
+              setStudent({ ...student, session: e.target.value })
             }
           />
           <hr />

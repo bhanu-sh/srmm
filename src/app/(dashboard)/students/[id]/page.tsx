@@ -84,9 +84,7 @@ export default function StudentPage({ params }: any) {
         return;
       }
 
-      const response = await axios.post("/api/course/getbycollege", {
-        college_id: session.user.college_id,
-      });
+      const response = await axios.get("/api/course/getall");
       console.log("Courses response:", response.data);
 
       if (response.data && Array.isArray(response.data.data)) {
@@ -257,10 +255,9 @@ export default function StudentPage({ params }: any) {
                   <div className="flex justify-around mt-20">
                     <Sheet>
                       <SheetTrigger asChild>
-                        {!student.college_id.lock &&
-                          session.user.role === "CollegeAdmin" && (
-                            <Button variant={"warning"}>Edit</Button>
-                          )}
+                        {session.user.role === "CollegeAdmin" && (
+                          <Button variant={"warning"}>Edit</Button>
+                        )}
                       </SheetTrigger>
                       <SheetContent className="overflow-y-auto max-h-full">
                         <SheetHeader>
@@ -273,32 +270,16 @@ export default function StudentPage({ params }: any) {
                         <div className="grid gap-4 py-4">
                           <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="f_name" className="text-right">
-                              First Name
+                              Name
                             </Label>
                             <Input
-                              id="f_name"
-                              value={student.f_name}
+                              id="name"
+                              value={student.name}
                               className="col-span-3"
                               onChange={(e) =>
                                 setStudent({
                                   ...student,
-                                  f_name: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="l_name" className="text-right">
-                              Last Name
-                            </Label>
-                            <Input
-                              id="l_name"
-                              value={student.l_name}
-                              className="col-span-3"
-                              onChange={(e) =>
-                                setStudent({
-                                  ...student,
-                                  l_name: e.target.value,
+                                  name: e.target.value,
                                 })
                               }
                             />
@@ -530,9 +511,7 @@ export default function StudentPage({ params }: any) {
                     </Sheet>
                     <Dialog>
                       <DialogTrigger>
-                        {!student.college_id.lock && (
-                          <Button variant={"info"}>Add Fee</Button>
-                        )}
+                        {<Button variant={"info"}>Add Fee</Button>}
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
@@ -637,9 +616,7 @@ export default function StudentPage({ params }: any) {
                   <h1 className="text-2xl font-semibold underline text-center">
                     Student Details
                   </h1>
-                  <p className="py-2 text-1xl">
-                    Name: {student.f_name} {student.l_name}
-                  </p>
+                  <p className="py-2 text-1xl">Name: {student.name}</p>
                   <p className="py-2 text-1xl">DOB: {student.dob}</p>
                   <p className="py-2 text-1xl">Roll No: {student.roll_no}</p>
                   <p className="py-2 text-1xl">
@@ -685,79 +662,77 @@ export default function StudentPage({ params }: any) {
                             {fee.type === "fee" && (
                               <p className="py-2 text-1xl" key={fee._id}>
                                 {fee.name}: &#8377; {fee.amount}{" "}
-                                {!student.college_id.lock &&
-                                  session.user.role === "CollegeAdmin" && (
-                                    <span>
-                                      <Dialog>
-                                        <DialogTrigger>
-                                          <Button variant={"link"}>Edit</Button>
-                                        </DialogTrigger>
-                                        <DialogContent>
-                                          <DialogHeader>
-                                            <DialogTitle>
-                                              Edit {fee.name}
-                                            </DialogTitle>
-                                            <DialogDescription>
-                                              <p className="my-2 text-orange-500">
-                                                Only fill the fields you want to
-                                                edit
-                                              </p>
-                                              <div className="flex flex-col gap-2 justify-center">
-                                                <Label htmlFor="name">
-                                                  Fee Name
-                                                </Label>
-                                                <Input
-                                                  placeholder={fee.name}
-                                                  onChange={(e) =>
-                                                    setChangedFee({
-                                                      ...changedFee,
-                                                      name: e.target.value,
-                                                    })
-                                                  }
-                                                />
-                                                <Label htmlFor="description">
-                                                  Description
-                                                </Label>
-                                                <Input
-                                                  placeholder={fee.description}
-                                                  onChange={(e) =>
-                                                    setChangedFee({
-                                                      ...changedFee,
-                                                      description:
-                                                        e.target.value,
-                                                    })
-                                                  }
-                                                />
-                                                <Label htmlFor="amount">
-                                                  Amount
-                                                </Label>
-                                                <Input
-                                                  placeholder={fee.amount}
-                                                  onChange={(e) =>
-                                                    setChangedFee({
-                                                      ...changedFee,
-                                                      amount: e.target.value,
-                                                    })
-                                                  }
-                                                />
+                                {session.user.role === "CollegeAdmin" && (
+                                  <span>
+                                    <Dialog>
+                                      <DialogTrigger>
+                                        <Button variant={"link"}>Edit</Button>
+                                      </DialogTrigger>
+                                      <DialogContent>
+                                        <DialogHeader>
+                                          <DialogTitle>
+                                            Edit {fee.name}
+                                          </DialogTitle>
+                                          <DialogDescription>
+                                            <p className="my-2 text-orange-500">
+                                              Only fill the fields you want to
+                                              edit
+                                            </p>
+                                            <div className="flex flex-col gap-2 justify-center">
+                                              <Label htmlFor="name">
+                                                Fee Name
+                                              </Label>
+                                              <Input
+                                                placeholder={fee.name}
+                                                onChange={(e) =>
+                                                  setChangedFee({
+                                                    ...changedFee,
+                                                    name: e.target.value,
+                                                  })
+                                                }
+                                              />
+                                              <Label htmlFor="description">
+                                                Description
+                                              </Label>
+                                              <Input
+                                                placeholder={fee.description}
+                                                onChange={(e) =>
+                                                  setChangedFee({
+                                                    ...changedFee,
+                                                    description: e.target.value,
+                                                  })
+                                                }
+                                              />
+                                              <Label htmlFor="amount">
+                                                Amount
+                                              </Label>
+                                              <Input
+                                                placeholder={fee.amount}
+                                                onChange={(e) =>
+                                                  setChangedFee({
+                                                    ...changedFee,
+                                                    amount: e.target.value,
+                                                  })
+                                                }
+                                              />
 
-                                                <DialogClose>
-                                                  <Button
-                                                    variant={"info"}
-                                                    onClick={() => {
-                                                      editFee(fee._id);
-                                                    }}
-                                                  >
-                                                    Edit
-                                                  </Button>
-                                                </DialogClose>
-                                              </div>
-                                            </DialogDescription>
-                                          </DialogHeader>
-                                        </DialogContent>
-                                      </Dialog>
-                                    </span>
-                                  )}
+                                              <DialogClose>
+                                                <Button
+                                                  variant={"info"}
+                                                  onClick={() => {
+                                                    editFee(fee._id);
+                                                  }}
+                                                >
+                                                  Edit
+                                                </Button>
+                                              </DialogClose>
+                                            </div>
+                                          </DialogDescription>
+                                        </DialogHeader>
+                                      </DialogContent>
+                                    </Dialog>
+                                  </span>
+                                )}
                               </p>
                             )}
                           </>

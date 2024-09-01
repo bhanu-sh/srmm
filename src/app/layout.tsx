@@ -8,8 +8,8 @@ import AuthProvider from "@/contexts/authProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CampusEase",
-  description: "Streamlining Success in Higher Education",
+  title: "SRMM",
+  description: "Shri Rajroop Memorial Mahavidyalaya",
 };
 
 export default function RootLayout({
