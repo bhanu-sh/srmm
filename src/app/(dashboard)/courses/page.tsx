@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Select } from "@/components/ui/select";
+import toast from "react-hot-toast";
 
 export default function CoursesPage() {
   const { data: session } = useSession();
@@ -36,12 +37,8 @@ export default function CoursesPage() {
 
   const [addedCourse, setAddedCourse] = useState({
     name: "",
-    duration: 0,
-  });
-  const [addedSession, setAddedSession] = useState({
-    start: "",
-    end: "",
-    course: "",
+    session_start: 0,
+    session_end: 0,
   });
   const [loading, setLoading] = useState(false);
 
@@ -51,13 +48,6 @@ export default function CoursesPage() {
       const res = await axios.get(`/api/course/getall`);
       console.log(res.data.data);
       setCourses(res.data.data);
-      //set fisrt course as default
-      if (res.data.data.length > 0) {
-        setAddedSession({
-          ...addedSession,
-          course: res.data.data[0]._id,
-        });
-      }
     } catch (error: any) {
       console.log("Getting courses failed", error.response);
     } finally {
@@ -70,27 +60,13 @@ export default function CoursesPage() {
     try {
       await axios.post(`/api/course/add`, {
         name: addedCourse.name,
-        duration: addedCourse.duration,
+        session_start: addedCourse.session_start,
+        session_end: addedCourse.session_end,
       });
       handleFetchData();
+      toast.success("Course added successfully");
     } catch (error: any) {
       console.log("Adding course failed", error.response);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const addSession = async () => {
-    setLoading(true);
-    try {
-      await axios.post(`/api/session/add`, {
-        start: addedSession.start,
-        end: addedSession.end,
-        course: addedSession.course,
-      });
-      handleFetchData();
-    } catch (error: any) {
-      console.log("Adding session failed", error.response);
     } finally {
       setLoading(false);
     }
@@ -128,15 +104,13 @@ export default function CoursesPage() {
                 key={course._id}
                 className="w-80 p-4 bg-green-100 rounded-lg shadow-md my-5"
               >
+                <h1 className="text-4xl font-semibold">{course.name}</h1>
                 <h2 className="text-xl font-semibold">
-                  {course.name} (Year {course.duration})
+                  Session: {course.session_start} - {course.session_end}
                 </h2>
-                <h1 className="text-4xl text-red-500 font-semibold">
-                  {course.students?.length} Students
-                </h1>
                 <div className="flex justify-between items-center mt-4">
                   <Link
-                    href={`/dashboard/courses/${course.name}-${course.duration}`}
+                    href={`/courses/${course.name}-${course.session_start}-${course.session_end}`}
                   >
                     <Button variant="default">View</Button>
                   </Link>
@@ -196,85 +170,27 @@ export default function CoursesPage() {
                   }
                 />
                 <Input
-                  placeholder="Year"
+                  placeholder="Session Start Year"
                   type="number"
-                  value={addedCourse.duration}
                   onChange={(e) =>
                     setAddedCourse({
                       ...addedCourse,
-                      duration: parseInt(e.target.value),
+                      session_start: parseInt(e.target.value),
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Session End Year"
+                  type="number"
+                  onChange={(e) =>
+                    setAddedCourse({
+                      ...addedCourse,
+                      session_end: parseInt(e.target.value),
                     })
                   }
                 />
                 <Button variant="info" onClick={addCourse}>
                   Add Course
-                </Button>
-              </div>
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-      <Dialog>
-        <DialogTrigger asChild>
-          <div className="inline-block">
-            <Button variant="info">Add Session</Button>
-          </div>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Session</DialogTitle>
-            <DialogDescription>
-              <div className="flex flex-col gap-2 justify-center">
-                <Input
-                  placeholder="Start Date"
-                  value={addedSession.start}
-                  onChange={(e) =>
-                    setAddedSession({ ...addedSession, start: e.target.value })
-                  }
-                />
-                <Input
-                  placeholder="End Date"
-                  value={addedSession.end}
-                  onChange={(e) =>
-                    setAddedSession({ ...addedSession, end: e.target.value })
-                  }
-                />
-                <div className="flex flex-col">
-                  <label htmlFor="course">Select Course</label>
-                  {courses.length > 0 && (
-                    <select
-                      name="course"
-                      id="course"
-                      className="w-full h-10 rounded-md border border-input bg-white px-3 py-2 text-sm text-gray-400"
-                      value={addedSession.course}
-                      onChange={(e) =>
-                        setAddedSession({
-                          ...addedSession,
-                          course: e.target.value,
-                        })
-                      }
-                    >
-                      {courses.length > 0 ? (
-                        courses.map((course: any) => (
-                          <option key={course._id} value={course._id}>
-                            {course.name}
-                          </option>
-                        ))
-                      ) : (
-                        <option>No courses available</option>
-                      )}
-                    </select>
-                  )}
-                </div>
-                {/* <Input
-                  placeholder="Course"
-                  value={addedSession.course}
-                  onChange={(e) =>
-                    setAddedSession({ ...addedSession, course: e.target.value })
-                  }
-                /> */}
-                <Button variant="info" onClick={addSession}>
-                  Add Session
                 </Button>
               </div>
             </DialogDescription>

@@ -300,27 +300,26 @@ export default function StudentTable({
                       }}
                     />
                   </td>
-                  <td className="px-6 py-4 bg-gray-50">
-                    {user.name}
-                  </td>
-                  <td className="px-6 py-4">
-                    {new Date(user.dob).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                  <td className="px-6 py-4 bg-gray-50">{user.name}</td>
+                  <td className="px-6 py-4 text-center">
+                    {user.dob
+                      ? new Date(user.dob).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : ""}
                   </td>
                   <td className="px-6 py-4 bg-gray-50">{user.phone}</td>
                   <td className="px-6 py-4">{user.email}</td>
                   <td className="px-6 py-4 bg-gray-50">{user.course?.name}</td>
-                  <td className="px-6 py-4">{user.session_start_year}</td>
+                  <td className="px-6 py-4">
+                    {user.course?.session_start} - {user.course?.session_end}
+                  </td>
                   <td className="px-6 py-4 bg-gray-50">{user.roll_no}</td>
 
                   <td className="px-6 py-3 flex flex-col">
-                    <Link
-                      className="mb-2"
-                      href={`/students/${user._id}`}
-                    >
+                    <Link className="mb-2" href={`/students/${user._id}`}>
                       <button className="bg-green-500 w-full hover:bg-green-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-green-400">
                         View
                       </button>

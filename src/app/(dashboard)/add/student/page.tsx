@@ -26,11 +26,11 @@ export default function AddStudent() {
     roll: "",
     aadhar: "",
     course: "",
-    session: "",
   });
   const [collegeLock, setCollegeLock] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState("");
   const [course, setCourse] = useState<any[]>([]);
 
   const getCollegeLock = async () => {
@@ -54,6 +54,7 @@ export default function AddStudent() {
       if (response.data && Array.isArray(response.data.data)) {
         setCourse(response.data.data);
         setStudent({ ...student, course: response.data.data[0]._id });
+        setSelectedCourse(response.data.data[0].name);
       } else {
         console.error("Unexpected response format:", response.data);
       }
@@ -89,8 +90,7 @@ export default function AddStudent() {
     if (
       student.name.length > 0 &&
       student.phone.length > 0 &&
-      student.course.length > 0 &&
-      student.session.length > 0
+      student.course.length > 0
     ) {
       setButtonDisabled(false);
     } else {
@@ -257,11 +257,39 @@ export default function AddStudent() {
               setStudent({ ...student, pincode: e.target.value })
             }
           />
+          <label htmlFor="course">Course</label>
+          <div className="flex flex-col">
+            <label htmlFor="course">Select Course</label>
+            {course.length > 0 && (
+              <select
+                name="course"
+                id="course"
+                className="w-full h-10 rounded-md border border-input bg-white px-3 py-2 text-sm text-gray-400"
+                onChange={(e) => {
+                  const selected = course.find((c) => c._id === e.target.value);
+                  setStudent({ ...student, course: e.target.value });
+                  setSelectedCourse(selected?.name); // Set the selected course name
+                  console.log("Selected Course ID:", e.target.value);
+                }}
+              >
+                {course.length > 0 ? (
+                  course.map((course: any) => (
+                    <option key={course._id} value={course._id}>
+                      {course.name} (Session: {course.session_start} -{" "}
+                      {course.session_end})
+                    </option>
+                  ))
+                ) : (
+                  <option>No courses available</option>
+                )}
+              </select>
+            )}
+          </div>
           <label htmlFor="roll">Roll Number</label>
           <div className="flex flex-row items-center rounded-md">
-            <span className="font-bold pb-4 mr-1">SRMM</span>
+            <span className="font-bold pb-4 mr-1">SRMM{selectedCourse}</span>
             <input
-              placeholder="Search Student"
+              placeholder="Roll Number"
               className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
               value={student.roll}
               onChange={(e) => setStudent({ ...student, roll: e.target.value })}
@@ -276,43 +304,6 @@ export default function AddStudent() {
             value={student.aadhar}
             placeholder="Aadhar Number"
             onChange={(e) => setStudent({ ...student, aadhar: e.target.value })}
-          />
-          <label htmlFor="course">Course</label>
-          <div className="flex flex-col">
-            <label htmlFor="course">Select Course</label>
-            {course.length > 0 && (
-              <select
-                name="course"
-                id="course"
-                className="w-full h-10 rounded-md border border-input bg-white px-3 py-2 text-sm text-gray-400"
-                onChange={(e) => {
-                  setStudent({ ...student, course: e.target.value });
-                  console.log("Selected Course ID:", e.target.value); // Log the selected course ID
-                }}
-              >
-                {course.length > 0 ? (
-                  course.map((course: any) => (
-                    <option key={course._id} value={course._id}>
-                      {course.name}
-                    </option>
-                  ))
-                ) : (
-                  <option>No courses available</option>
-                )}
-              </select>
-            )}
-          </div>
-          <label htmlFor="session">Session</label>
-          <input
-            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-            id="session"
-            type="text"
-            required
-            value={student.session}
-            placeholder="Session Start Year"
-            onChange={(e) =>
-              setStudent({ ...student, session: e.target.value })
-            }
           />
           <hr />
           <button

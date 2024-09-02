@@ -7,15 +7,15 @@ connect();
 export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
-    const { name, duration } = reqBody;
+    const { name, session_start, session_end } = reqBody;
 
     console.log(reqBody);
 
     // Create new Course
     const newCourse = new Course({
       name,
-      duration,
-      students: [],
+      session_start,
+      session_end,
     });
 
     // Save Course

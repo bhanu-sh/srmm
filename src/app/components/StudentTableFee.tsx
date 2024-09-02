@@ -33,13 +33,15 @@ export default function StudentTableFee({
   role,
   lock,
   name,
-  year,
+  start,
+  end,
 }: {
   collegeId: string;
   role: string;
   lock: boolean;
   name: string;
-  year: string;
+  start: string;
+  end: string;
 }) {
   const [user, setUser] = useState([]);
   const [fee, setFee] = useState([]);
@@ -57,15 +59,15 @@ export default function StudentTableFee({
   const getStudents = async () => {
     try {
       console.log(collegeId);
-      const response = await axios.post(`/api/student/getbycollege`, {
-        college_id: collegeId,
-      });
+      const response = await axios.get(`/api/student/getall`);
       console.log(response.data.data);
-      //filter user by course name and year
-      console.log(name, year);
+      //filter user by course name and session year
+      console.log(name, start, end);
       const filteredUser = response.data.data.filter(
         (user: any) =>
-          user.course.name === name && user.course.duration === Number(year)
+          user.course.name === name &&
+          user.course.session_start === Number(start) &&
+          user.course.session_end === Number(end)
       );
 
       setUser(filteredUser);
@@ -77,9 +79,7 @@ export default function StudentTableFee({
 
   const getFee = async () => {
     try {
-      const response = await axios.post(`/api/fee/getbycollege`, {
-        college_id: collegeId,
-      });
+      const response = await axios.get(`/api/fee/getall`);
       var total = 0;
       var paid = 0;
       response.data.data.forEach((item: any) => {
@@ -174,8 +174,7 @@ export default function StudentTableFee({
   const searchUser = (query: string) => {
     const results = user.filter((user: any) => {
       return (
-        user.f_name?.toLowerCase().includes(query.toLowerCase()) ||
-        user.l_name?.toLowerCase().includes(query.toLowerCase()) ||
+        user.name?.toLowerCase().includes(query.toLowerCase()) ||
         user.phone?.toLowerCase().includes(query.toLowerCase()) ||
         user.email?.toLowerCase().includes(query.toLowerCase()) ||
         user.session_start_year?.toString().includes(query.toLowerCase()) ||
@@ -226,11 +225,6 @@ export default function StudentTableFee({
           Students
         </h1>
         <div className="flex justify-between mb-4">
-          <Link href="/dashboard/add/student">
-            <button className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-700">
-              Add Student
-            </button>
-          </Link>
           <Dialog>
             <DialogTrigger>
               <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-green-400">
@@ -351,7 +345,7 @@ export default function StudentTableFee({
                 <th
                   scope="col"
                   className="px-6 py-3 cursor-pointer"
-                  onClick={() => sortData("f_name")}
+                  onClick={() => sortData("name")}
                 >
                   Name
                 </th>
@@ -398,12 +392,12 @@ export default function StudentTableFee({
                   </td>
                   <td className="px-6 py-4 bg-gray-50">{user.roll_no}</td>
                   <td className="px-6 py-4">
-                    {user.f_name} {user.l_name}
+                    {user.name}
                   </td>
                   <td className="px-6 py-4 bg-gray-50">{user.father_name}</td>
                   <td className="px-6 py-4">{user.phone}</td>
                   <td className="px-6 py-4 bg-gray-50">
-                    {user.session_start_year} - {user.session_end_year}
+                    {user.course.session_start} - {user.course.session_end}
                   </td>
                   <td className="px-6 py-4">
                     {fee
@@ -439,7 +433,7 @@ export default function StudentTableFee({
                   <td className="px-6 py-3 flex flex-col">
                     <Link
                       className="mb-2"
-                      href={`/dashboard/students/${user._id}`}
+                      href={`/students/${user._id}`}
                     >
                       <button className="bg-green-500 w-full hover:bg-green-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-green-400">
                         View

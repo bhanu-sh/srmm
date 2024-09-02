@@ -6,12 +6,14 @@ const courseSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    sessions: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "sessions",
-      },
-    ],
+    session_start: {
+      type: Number,
+      required: true,
+    },
+    session_end: {
+      type: Number,
+      required: true,
+    },
   },
   {
     timestamps: true,

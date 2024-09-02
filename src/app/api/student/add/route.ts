@@ -1,7 +1,6 @@
 import { connect } from "@/dbConfig/dbConfig";
-import { Student } from "@/models";
+import { Student, Course } from "@/models";
 import { Fee } from "@/models";
-import { Session } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
@@ -25,10 +24,16 @@ export async function POST(request: NextRequest) {
       roll,
       aadhar,
       course,
-      session,
     } = reqBody;
 
     console.log(reqBody);
+
+    const courseData = await Course.findById(course);
+    const courseName = courseData.name;
+
+    console.log(courseName);
+
+    const newRoll = `SRMM${courseName.toUpperCase()}${roll}`;
 
     // Check if Student already exists
     const student = await Student.findOne({ phone });
@@ -39,6 +44,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
@@ -58,10 +65,9 @@ export async function POST(request: NextRequest) {
       state,
       password: hashedPassword,
       role: "Student",
-      roll_no: roll,
+      roll_no: newRoll,
       aadhar,
       course,
-      session,
     });
 
     const savedStudent = await newStudent.save();
@@ -81,12 +87,6 @@ export async function POST(request: NextRequest) {
     savedStudent.fees.push(newCourseFee._id);
 
     await savedStudent.save();
-
-    // Update Session
-    const sessionDetails = await Session.findOne({ _id: session });
-    sessionDetails.students.push(savedStudent._id);
-
-    await sessionDetails.save();
 
     return NextResponse.json({
       message: "Student addedd successfully",
