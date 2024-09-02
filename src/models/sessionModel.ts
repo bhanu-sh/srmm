@@ -14,12 +14,6 @@ const sessionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "courses",
     },
-    students: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "students",
-      },
-    ],
   },
   {
     timestamps: true,

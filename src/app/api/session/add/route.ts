@@ -7,7 +7,7 @@ connect();
 export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
-    const { start, end, courseId } = reqBody;
+    const { start, end, course } = reqBody;
 
     console.log(reqBody);
 
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const newSession = new Session({
       start,
       end,
-      course: courseId,
+      course,
       students: [],
     });
 
