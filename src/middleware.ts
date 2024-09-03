@@ -33,14 +33,16 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    "/dashboard/:path*",
-    "/colleges/:path*",
-    "/add/:path*",
-    "/api/user/getall",
-    "/api/user/admin/getall",
-    "/api/college/getbyid",
-    "/api/user/student/getbycollege",
-    "/api/college/:path*",
     "/",
+    "/add/:path*",
+    "/courses/:path*",
+    "/expenses/:path*",
+    "/fees/:path*",
+    "/staffs/:path*",
+    "/students/:path*",
+    "/api/student/:path*",
+    "/api/course/:path*",
+    "/api/expense/:path*",
+    "/api/fee/:path*",
   ],
 };
