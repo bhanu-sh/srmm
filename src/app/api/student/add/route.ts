@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
       roll,
       aadhar,
       course,
+      date_of_admission,
     } = reqBody;
 
     console.log(reqBody);
@@ -68,6 +69,7 @@ export async function POST(request: NextRequest) {
       roll_no: newRoll,
       aadhar,
       course,
+      date_of_admission,
     });
 
     const savedStudent = await newStudent.save();

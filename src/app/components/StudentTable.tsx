@@ -280,6 +280,13 @@ export default function StudentTable({
                 >
                   Roll No
                 </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 cursor-pointer bg-gray-50"
+                  onClick={() => sortData("roll_no")}
+                >
+                  Date of Admission
+                </th>
                 <th scope="col" className="px-6 py-3">
                   Actions
                 </th>
@@ -318,7 +325,18 @@ export default function StudentTable({
                     {user.course?.session_start} - {user.course?.session_end}
                   </td>
                   <td className="px-6 py-4 bg-gray-50">{user.roll_no}</td>
-
+                  <td className="px-6 py-4">
+                    {user.date_of_admission
+                      ? new Date(user.date_of_admission).toLocaleDateString(
+                          undefined,
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )
+                      : ""}
+                  </td>
                   <td className="px-6 py-3 flex flex-col">
                     <Link className="mb-2" href={`/students/${user._id}`}>
                       <button className="bg-green-500 w-full hover:bg-green-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-green-400">

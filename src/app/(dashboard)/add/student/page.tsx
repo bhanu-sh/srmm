@@ -26,6 +26,7 @@ export default function AddStudent() {
     roll: "",
     aadhar: "",
     course: "",
+    date_of_admission: new Date().toISOString().split("T")[0],
   });
   const [collegeLock, setCollegeLock] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
@@ -134,6 +135,56 @@ export default function AddStudent() {
             </Link>
           </div>
           <hr />
+          <label htmlFor="course">Course</label>
+          <div className="flex flex-col">
+            <label htmlFor="course">Select Course</label>
+            {course.length > 0 && (
+              <select
+                name="course"
+                id="course"
+                className="w-full h-10 rounded-md border border-input bg-white px-3 py-2 text-sm text-gray-400"
+                onChange={(e) => {
+                  const selected = course.find((c) => c._id === e.target.value);
+                  setStudent({ ...student, course: e.target.value });
+                  setSelectedCourse(selected?.name); // Set the selected course name
+                  console.log("Selected Course ID:", e.target.value);
+                }}
+              >
+                {course.length > 0 ? (
+                  course.map((course: any) => (
+                    <option key={course._id} value={course._id}>
+                      {course.name} (Session: {course.session_start} -{" "}
+                      {course.session_end})
+                    </option>
+                  ))
+                ) : (
+                  <option>No courses available</option>
+                )}
+              </select>
+            )}
+          </div>
+          <label htmlFor="roll">Roll Number</label>
+          <div className="flex flex-row items-center rounded-md">
+            <span className="font-bold pb-4 mr-1">SRMM{selectedCourse}</span>
+            <input
+              placeholder="Roll Number"
+              className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
+              value={student.roll}
+              onChange={(e) => setStudent({ ...student, roll: e.target.value })}
+            />
+          </div>
+          <label htmlFor="date_of_admission">Date of Admission</label>
+          <input
+            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
+            id="date_of_admission"
+            type="date"
+            required
+            value={student.date_of_admission}
+            placeholder="Date of Admission"
+            onChange={(e) =>
+              setStudent({ ...student, date_of_admission: e.target.value })
+            }
+          />
           <label htmlFor="name">Name</label>
           <input
             className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
@@ -257,44 +308,6 @@ export default function AddStudent() {
               setStudent({ ...student, pincode: e.target.value })
             }
           />
-          <label htmlFor="course">Course</label>
-          <div className="flex flex-col">
-            <label htmlFor="course">Select Course</label>
-            {course.length > 0 && (
-              <select
-                name="course"
-                id="course"
-                className="w-full h-10 rounded-md border border-input bg-white px-3 py-2 text-sm text-gray-400"
-                onChange={(e) => {
-                  const selected = course.find((c) => c._id === e.target.value);
-                  setStudent({ ...student, course: e.target.value });
-                  setSelectedCourse(selected?.name); // Set the selected course name
-                  console.log("Selected Course ID:", e.target.value);
-                }}
-              >
-                {course.length > 0 ? (
-                  course.map((course: any) => (
-                    <option key={course._id} value={course._id}>
-                      {course.name} (Session: {course.session_start} -{" "}
-                      {course.session_end})
-                    </option>
-                  ))
-                ) : (
-                  <option>No courses available</option>
-                )}
-              </select>
-            )}
-          </div>
-          <label htmlFor="roll">Roll Number</label>
-          <div className="flex flex-row items-center rounded-md">
-            <span className="font-bold pb-4 mr-1">SRMM{selectedCourse}</span>
-            <input
-              placeholder="Roll Number"
-              className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-              value={student.roll}
-              onChange={(e) => setStudent({ ...student, roll: e.target.value })}
-            />
-          </div>
           <label htmlFor="aadhar">Aadhar Number</label>
           <input
             className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
@@ -305,6 +318,7 @@ export default function AddStudent() {
             placeholder="Aadhar Number"
             onChange={(e) => setStudent({ ...student, aadhar: e.target.value })}
           />
+
           <hr />
           <button
             className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 disabled:opacity-50"

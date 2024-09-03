@@ -54,6 +54,9 @@ const studentSchema = new mongoose.Schema(
     aadhar: {
       type: String,
     },
+    date_of_admission: {
+      type: Date,
+    },
     course: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "courses",
