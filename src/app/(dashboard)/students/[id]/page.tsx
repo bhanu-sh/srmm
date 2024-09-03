@@ -79,11 +79,6 @@ export default function StudentPage({ params }: any) {
 
   const getCourses = async () => {
     try {
-      if (!session?.user?.college_id) {
-        console.warn("No college ID found in session.");
-        return;
-      }
-
       const response = await axios.get("/api/course/getall");
       console.log("Courses response:", response.data);
 
@@ -316,7 +311,8 @@ export default function StudentPage({ params }: any) {
                                 {courses &&
                                   courses.map((course: any) => (
                                     <SelectItem key={course._id} value={course}>
-                                      {course.name}
+                                      {course.name} ({course.session_start} -{" "}
+                                      {course.session_end})
                                     </SelectItem>
                                   ))}
                               </SelectContent>

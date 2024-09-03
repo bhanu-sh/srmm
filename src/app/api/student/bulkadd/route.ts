@@ -45,8 +45,6 @@ export async function POST(request: NextRequest) {
         roll,
         aadhar,
         course_fee,
-        session_start_year,
-        session_end_year,
       } = student;
 
       try {
@@ -101,8 +99,6 @@ export async function POST(request: NextRequest) {
           roll_no: roll,
           aadhar,
           course: course_id,
-          session_start_year,
-          session_end_year,
         });
 
         // Save Student

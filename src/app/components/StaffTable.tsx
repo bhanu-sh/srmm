@@ -26,6 +26,9 @@ export default function StaffTable({
   collegeId: string;
   lock: boolean;
 }) {
+
+  const { data: session } = useSession();
+
   const [user, setUser] = useState([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [search, setSearch] = useState("");
@@ -271,26 +274,24 @@ export default function StaffTable({
                   <td className="px-6 py-4 bg-gray-50 ">{user.name}</td>
                   <td className="px-6 py-4 bg-gray-50 ">{user.phone}</td>
                   <td className="px-6 py-4 ">
-                    {new Date(user.dob).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    {user.dob
+                      ? new Date(user.dob).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : ""}
                   </td>
                   <td className="px-6 py-4 bg-gray-50 ">
-                    {user.address +
-                      ", " +
-                      user.city +
-                      ", " +
-                      user.state +
-                      " (" +
-                      user.pincode +
-                      ")"}
+                    {user.address ? user.address + ", " : ""}{" "}
+                    {user.city ? user.city + ", " : ""}{" "}
+                    {user.state ? user.state + " (" : ""}{" "}
+                    {user.pincode ? user.pincode + ")" : ""}
                   </td>
                   <td className="px-6 py-3 flex flex-col">
                     <Link
                       className="mb-2"
-                      href={`/dashboard/staffs/${user._id}`}
+                      href={`/staffs/${user._id}`}
                     >
                       <button className="bg-green-500 w-full hover:bg-green-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-green-400">
                         View
@@ -300,7 +301,7 @@ export default function StaffTable({
                       <AlertDialog>
                         <AlertDialogTrigger>
                           <button
-                            disabled={lock}
+                            disabled={user._id === session?.user?._id}
                             className="bg-red-500 w-full hover:bg-red-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-red-400 disabled:opacity-50 disabled:bg-red-500"
                           >
                             Delete

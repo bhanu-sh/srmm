@@ -66,20 +66,13 @@ export default function FeesPage({ params }: any) {
         <div className="bg-white p-8 w-full">
           <div className="flex flex-col items-center">
             <p className="bg-black text-white rounded-xl px-2">Receipt</p>
-            <img
-              src={fee.college_id.image}
-              alt={fee.college_id.name}
-              className="h-16 w-16 rounded-full border-4 border-white -mt-2 -ml-56 -mb-12"
-            />
-
             <h1 className="text-2xl font-bold mb-4 text-center">
-              {fee.college_id.name}
+              Shri Rajroop Memorial Mahavidyalaya
             </h1>
 
             <div className="text-center text-gray-500 mb-4">
-              <span className="text-black font-semibold">Address:</span>{" "}
-              {fee.college_id.address}, {fee.college_id.city},{" "}
-              {fee.college_id.state} - {fee.college_id.pincode}
+              <span className="text-black font-semibold">Address:</span> Address
+              - Pincode
             </div>
             <div>
               <div className="flex justify-between mb-2">

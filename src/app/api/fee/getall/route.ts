@@ -6,7 +6,12 @@ connect();
 
 export async function GET(request: NextRequest) {
   try {
-    const fees = await Fee.find().populate("student_id");
+    const fees = await Fee.find().populate({
+      path: "student_id",
+      populate: {
+        path: "course",
+      },
+    });
     return NextResponse.json({ data: fees });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

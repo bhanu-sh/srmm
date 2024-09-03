@@ -28,6 +28,8 @@ export async function PUT(request: NextRequest) {
       const newCourse = await Course.findOne({ _id: rest.course });
 
       if (oldCourse) {
+        // Initialize students array if undefined
+        oldCourse.students = oldCourse.students || [];
         oldCourse.students = oldCourse.students.filter(
           (student_id: { toString: () => any }) => student_id.toString() !== _id
         );
@@ -36,6 +38,8 @@ export async function PUT(request: NextRequest) {
       }
 
       if (newCourse) {
+        // Initialize students array if undefined
+        newCourse.students = newCourse.students || [];
         newCourse.students.push(_id);
         await newCourse.save();
       }

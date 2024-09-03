@@ -143,7 +143,7 @@ export default function AddStudents() {
             {course.length > 0 ? (
               course.map((course: any) => (
                 <option key={course._id} value={course._id}>
-                  {course.name} (Year {course.duration})
+                  {course.name} ({course.session_start} - {course.session_end})
                 </option>
               ))
             ) : (

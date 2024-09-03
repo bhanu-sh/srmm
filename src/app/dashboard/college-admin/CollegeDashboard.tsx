@@ -60,6 +60,7 @@ export default function CollegeDashboard() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
   const [pendingFees, setPendingFees] = useState(0);
+  const [receivedFees, setReceivedFees] = useState(0);
   const [expenses, setExpenses] = useState(0);
   const [disabled, setDisabled] = useState(true);
   const [settings, setSettings] = useState([]);
@@ -94,6 +95,13 @@ export default function CollegeDashboard() {
         0
       );
       setPendingFees(totalFees);
+
+      const totalReceivedFees = feesRes.data.data.reduce(
+        (acc: number, fee: any) =>
+          acc + (fee.type === "received" ? fee.amount : 0),
+        0
+      );
+      setReceivedFees(totalReceivedFees);
 
       const totalExpenses = expensesRes.data.data.reduce(
         (acc: number, expense: any) =>
@@ -316,7 +324,7 @@ export default function CollegeDashboard() {
                                         <span className="font-bold">
                                           Name:{" "}
                                         </span>
-                                        {student.f_name} {student.l_name}
+                                        {student.name}
                                       </p>
                                       <p>
                                         <span className="font-bold">
@@ -345,7 +353,7 @@ export default function CollegeDashboard() {
                                               <span className="font-bold">
                                                 Name:{" "}
                                               </span>
-                                              {student.f_name} {student.l_name}
+                                              {student.name}
                                             </p>
                                             <p>
                                               <span className="font-bold">
@@ -423,6 +431,11 @@ export default function CollegeDashboard() {
               <ExpenseCard
                 title="Pending Fees"
                 amount={formatCurrency(pendingFees)}
+                link="/fees/pending"
+              />
+              <ExpenseCard
+                title="Received Fees"
+                amount={formatCurrency(receivedFees)}
                 link="/fees"
               />
             </div>
