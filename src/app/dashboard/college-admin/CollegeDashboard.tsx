@@ -159,9 +159,7 @@ export default function CollegeDashboard() {
   };
 
   useEffect(() => {
-    if (!students.length || !staffs.length || !course.length) {
-      handleFetchData();
-    }
+    handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 

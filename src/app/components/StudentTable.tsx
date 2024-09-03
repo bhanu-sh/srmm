@@ -34,6 +34,7 @@ export default function StudentTable({
     try {
       const response = await axios.get("/api/student/getall");
       setUser(response.data.data);
+      console.log("Students", response.data.data);
       setSearchResults(response.data.data); // Initialize search results with all students
     } catch (error: any) {
       console.log("Error", error.response.data.error);
