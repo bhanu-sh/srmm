@@ -2,9 +2,9 @@ import { connect } from "@/dbConfig/dbConfig";
 import { Student } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 
-connect();
-
 export async function GET(request: NextRequest) {
+  await connect();
+  
   try {
     const students = await Student.find().populate("course");
     return NextResponse.json({ data: students });

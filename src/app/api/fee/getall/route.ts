@@ -2,9 +2,9 @@ import { connect } from "@/dbConfig/dbConfig";
 import { Fee } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 
-connect();
-
 export async function GET(request: NextRequest) {
+  await connect();
+
   try {
     const fees = await Fee.find().populate({
       path: "student_id",

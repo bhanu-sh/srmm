@@ -2,9 +2,9 @@ import { connect } from "@/dbConfig/dbConfig";
 import { Expense } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 
-connect();
-
 export async function GET(request: NextRequest) {
+  await connect();
+  
   try {
     const expenses = await Expense.find();
     return NextResponse.json({ data: expenses });
