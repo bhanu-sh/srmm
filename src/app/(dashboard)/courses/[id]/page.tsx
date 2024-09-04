@@ -6,13 +6,7 @@ import axios from "axios";
 import StudentTableFee from "@/app/components/StudentTableFee";
 
 export default function CourseStudentPage({ params }: any) {
-  const { name } = params;
-
-  //split the name to get the name-year
-  const splitName = name.split("-");
-  const courseName = splitName[0];
-  const sessionStart = splitName[1];
-  const sessionEnd = splitName[2];
+  const { id } = params;
 
   const { data: session } = useSession();
   const [college, setCollege] = useState<any>(null);
@@ -42,9 +36,7 @@ export default function CourseStudentPage({ params }: any) {
             collegeId={String(session.user.college_id)}
             role={String(session.user.role)}
             lock={college?.lock}
-            name={courseName}
-            start={sessionStart}
-            end={sessionEnd}
+            courseId={id}
           />
         </>
       )}

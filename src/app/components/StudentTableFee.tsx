@@ -32,16 +32,12 @@ export default function StudentTableFee({
   collegeId,
   role,
   lock,
-  name,
-  start,
-  end,
+  courseId,
 }: {
   collegeId: string;
   role: string;
   lock: boolean;
-  name: string;
-  start: string;
-  end: string;
+  courseId: string;
 }) {
   const [user, setUser] = useState([]);
   const [fee, setFee] = useState([]);
@@ -61,17 +57,26 @@ export default function StudentTableFee({
       console.log(collegeId);
       const response = await axios.get(`/api/student/getall`);
       console.log(response.data.data);
-      //filter user by course name and session year
-      console.log(name, start, end);
       const filteredUser = response.data.data.filter(
-        (user: any) =>
-          user.course.name === name &&
-          user.course.session_start === Number(start) &&
-          user.course.session_end === Number(end)
+        (user: any) => user.course._id === courseId
       );
 
       setUser(filteredUser);
       setSearchResults(filteredUser);
+      console.log(filteredUser);
+    } catch (error: any) {
+      console.log("Error", error.response.data.error);
+    }
+  };
+
+  const getCourses = async () => {
+    try {
+      const response = await axios.get(`/api/course/getall`);
+      const course = response.data.data.find(
+        (course: any) => course._id === courseId
+      );
+      getStudents();
+      console.log(course);
     } catch (error: any) {
       console.log("Error", error.response.data.error);
     }
@@ -207,10 +212,10 @@ export default function StudentTableFee({
   };
 
   useEffect(() => {
-    getStudents();
+    getCourses();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [courseId]);
 
   useEffect(() => {
     searchUser(search);
@@ -391,9 +396,7 @@ export default function StudentTableFee({
                     />
                   </td>
                   <td className="px-6 py-4 bg-gray-50">{user.roll_no}</td>
-                  <td className="px-6 py-4">
-                    {user.name}
-                  </td>
+                  <td className="px-6 py-4">{user.name}</td>
                   <td className="px-6 py-4 bg-gray-50">{user.father_name}</td>
                   <td className="px-6 py-4">{user.phone}</td>
                   <td className="px-6 py-4 bg-gray-50">
@@ -431,10 +434,7 @@ export default function StudentTableFee({
                   </td>
 
                   <td className="px-6 py-3 flex flex-col">
-                    <Link
-                      className="mb-2"
-                      href={`/students/${user._id}`}
-                    >
+                    <Link className="mb-2" href={`/students/${user._id}`}>
                       <button className="bg-green-500 w-full hover:bg-green-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-green-400">
                         View
                       </button>

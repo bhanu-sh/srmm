@@ -26,19 +26,24 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Select } from "@/components/ui/select";
 import toast from "react-hot-toast";
 
 export default function CoursesPage() {
   const { data: session } = useSession();
 
   const [courses, setCourses] = useState([]);
-  const [sessions, setSessions] = useState([]);
-
+  const [updatedCourse, setUpdatedCourse] = useState({
+    _id: "",
+    name: "",
+    session_start: 0,
+    session_end: 0,
+    course_fee: 0,
+  });
   const [addedCourse, setAddedCourse] = useState({
     name: "",
     session_start: 0,
     session_end: 0,
+    course_fee: 0,
   });
   const [loading, setLoading] = useState(false);
 
@@ -46,7 +51,6 @@ export default function CoursesPage() {
     setLoading(true);
     try {
       const res = await axios.get(`/api/course/getall`);
-      console.log(res.data.data);
       setCourses(res.data.data);
     } catch (error: any) {
       console.log("Getting courses failed", error.response);
@@ -72,6 +76,19 @@ export default function CoursesPage() {
     }
   };
 
+  const updateCourse = async () => {
+    setLoading(true);
+    try {
+      await axios.put(`/api/course/edit`, updatedCourse);
+      handleFetchData();
+      toast.success("Course updated successfully");
+    } catch (error: any) {
+      console.log("Updating course failed", error.response);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const deleteCourse = async (course_id: string) => {
     setLoading(true);
     try {
@@ -86,6 +103,16 @@ export default function CoursesPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditClick = (course: any) => {
+    setUpdatedCourse({
+      _id: course._id,
+      name: course.name,
+      session_start: course.session_start,
+      session_end: course.session_end,
+      course_fee: course.course_fee,
+    });
   };
 
   useEffect(() => {
@@ -109,11 +136,76 @@ export default function CoursesPage() {
                   Session: {course.session_start} - {course.session_end}
                 </h2>
                 <div className="flex justify-between items-center mt-4">
-                  <Link
-                    href={`/courses/${course.name}-${course.session_start}-${course.session_end}`}
-                  >
+                  <Link href={`/courses/${course._id}`}>
                     <Button variant="default">View</Button>
                   </Link>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="info"
+                        onClick={() => handleEditClick(course)}
+                      >
+                        Edit
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Edit Course</DialogTitle>
+                        <DialogDescription>
+                          <div className="flex flex-col gap-2 justify-center">
+                            <Input
+                              placeholder="Course Name"
+                              value={updatedCourse.name}
+                              onChange={(e) =>
+                                setUpdatedCourse({
+                                  ...updatedCourse,
+                                  name: e.target.value,
+                                })
+                              }
+                            />
+                            <Input
+                              placeholder="Session Start Year"
+                              type="number"
+                              value={updatedCourse.session_start}
+                              onChange={(e) =>
+                                setUpdatedCourse({
+                                  ...updatedCourse,
+                                  session_start: parseInt(e.target.value),
+                                })
+                              }
+                            />
+                            <Input
+                              placeholder="Session End Year"
+                              type="number"
+                              value={updatedCourse.session_end}
+                              onChange={(e) =>
+                                setUpdatedCourse({
+                                  ...updatedCourse,
+                                  session_end: parseInt(e.target.value),
+                                })
+                              }
+                            />
+                            <Input
+                              placeholder="Course Fee"
+                              type="number"
+                              value={updatedCourse.course_fee}
+                              onChange={(e) =>
+                                setUpdatedCourse({
+                                  ...updatedCourse,
+                                  course_fee: parseInt(e.target.value),
+                                })
+                              }
+                            />
+                            <Button variant="info" onClick={updateCourse}>
+                              Update Course
+                            </Button>
+                          </div>
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
+
                   {session?.user.role === "CollegeAdmin" && (
                     <AlertDialog>
                       <AlertDialogTrigger>
@@ -186,6 +278,16 @@ export default function CoursesPage() {
                     setAddedCourse({
                       ...addedCourse,
                       session_end: parseInt(e.target.value),
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Course Fee"
+                  type="number"
+                  onChange={(e) =>
+                    setAddedCourse({
+                      ...addedCourse,
+                      course_fee: parseInt(e.target.value),
                     })
                   }
                 />

@@ -64,19 +64,6 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // Check if student already exists
-        const studentExist = await Student.findOne({ phone });
-
-        if (studentExist) {
-          results.push({
-            phone,
-            status: "error",
-            message: "Student already exists",
-          });
-          console.log("Student already exists");
-          continue;
-        }
-
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);

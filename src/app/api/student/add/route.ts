@@ -36,16 +36,6 @@ export async function POST(request: NextRequest) {
 
     const newRoll = `SRMM${courseName?.split(" ")[0].toUpperCase()}${roll}`;
 
-    // Check if Student already exists
-    const student = await Student.findOne({ phone });
-
-    if (student) {
-      return NextResponse.json(
-        { error: "Student already exists" },
-        { status: 400 }
-      );
-    }
-
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password ? password : "123", salt);
@@ -77,7 +67,7 @@ export async function POST(request: NextRequest) {
     const newCourseFee = new Fee({
       name: "Course Fee",
       description: "Course Fee",
-      amount: 0,
+      amount: courseData.course_fee,
       type: "fee",
       receipt_no: course_receipt_no,
       student_id: savedStudent._id,

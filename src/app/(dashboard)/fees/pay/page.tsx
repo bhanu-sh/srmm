@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -79,9 +79,9 @@ export default function PayFeePage() {
 
   return (
     <div>
-      <h1>Pay Fee</h1>
+      <h1 className="text-4xl text-center font-semibold">Pay Fee</h1>
       <div className="flex flex-col gap-2 justify-center">
-        search for student
+        <p className="text-2xl">Search for Student</p>
         <div className="flex items-center border-2 border-gray-300 rounded-md px-2">
           <span className="font-bold">SRMM</span>
           <Input
@@ -115,26 +115,29 @@ export default function PayFeePage() {
                       </p>
                       <p>
                         <span className="font-bold">Pending Fees: </span>
-                        {fees
-                          .filter(
-                            (fee: any) =>
-                              fee.student_id === student._id &&
-                              fee.type === "fee"
-                          )
-                          .reduce(
-                            (acc: number, fee: any) => acc + fee.amount,
-                            0
-                          ) -
+                        {
+                          //reduced received fee from total fee
                           fees
                             .filter(
-                              (fee: any) =>
-                                fee.student_id === student._id &&
-                                fee.type === "received"
+                              (fee: any) => fee.student_id._id === student._id
                             )
                             .reduce(
-                              (acc: number, fee: any) => acc + fee.amount,
+                              (acc: number, curr: any) =>
+                                curr.type === "fee" ? acc + curr.amount : acc,
                               0
-                            )}
+                            ) -
+                            fees
+                              .filter(
+                                (fee: any) => fee.student_id._id === student._id
+                              )
+                              .reduce(
+                                (acc: number, curr: any) =>
+                                  curr.type === "received"
+                                    ? acc + curr.amount
+                                    : acc,
+                                0
+                              )
+                        }
                       </p>
                     </div>
                     <Dialog>
