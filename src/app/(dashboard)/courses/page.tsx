@@ -38,12 +38,14 @@ export default function CoursesPage() {
     session_start: 0,
     session_end: 0,
     course_fee: 0,
+    year: 0,
   });
   const [addedCourse, setAddedCourse] = useState({
     name: "",
     session_start: 0,
     session_end: 0,
     course_fee: 0,
+    year: 0,
   });
   const [loading, setLoading] = useState(false);
 
@@ -112,6 +114,7 @@ export default function CoursesPage() {
       session_start: course.session_start,
       session_end: course.session_end,
       course_fee: course.course_fee,
+      year: course.year,
     });
   };
 
@@ -183,6 +186,17 @@ export default function CoursesPage() {
                                 setUpdatedCourse({
                                   ...updatedCourse,
                                   session_end: parseInt(e.target.value),
+                                })
+                              }
+                            />
+                            <Input
+                              placeholder="Year"
+                              type="number"
+                              value={updatedCourse.year}
+                              onChange={(e) =>
+                                setUpdatedCourse({
+                                  ...updatedCourse,
+                                  year: parseInt(e.target.value),
                                 })
                               }
                             />
@@ -288,6 +302,16 @@ export default function CoursesPage() {
                     setAddedCourse({
                       ...addedCourse,
                       course_fee: parseInt(e.target.value),
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Year"
+                  type="number"
+                  onChange={(e) =>
+                    setAddedCourse({
+                      ...addedCourse,
+                      year: parseInt(e.target.value),
                     })
                   }
                 />
