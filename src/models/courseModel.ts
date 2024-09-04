@@ -14,7 +14,7 @@ const courseSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    fee: {
+    course_fee: {
       type: Number,
       required: true,
     },
