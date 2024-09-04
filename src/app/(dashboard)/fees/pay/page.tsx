@@ -114,18 +114,20 @@ export default function PayFeePage() {
                         {student.roll_no}
                       </p>
                       <p>
-                        <span className="font-bold">Pending Fees: </span>
+                        <span className="font-bold">Pending Fees: </span>{" "}
+                        &#8377;
                         {
                           //reduced received fee from total fee
-                          fees
-                            .filter(
-                              (fee: any) => fee.student_id._id === student._id
-                            )
-                            .reduce(
-                              (acc: number, curr: any) =>
-                                curr.type === "fee" ? acc + curr.amount : acc,
-                              0
-                            ) -
+                          (
+                            fees
+                              .filter(
+                                (fee: any) => fee.student_id._id === student._id
+                              )
+                              .reduce(
+                                (acc: number, curr: any) =>
+                                  curr.type === "fee" ? acc + curr.amount : acc,
+                                0
+                              ) -
                             fees
                               .filter(
                                 (fee: any) => fee.student_id._id === student._id
@@ -137,6 +139,7 @@ export default function PayFeePage() {
                                     : acc,
                                 0
                               )
+                          ).toFixed(2)
                         }
                       </p>
                     </div>
