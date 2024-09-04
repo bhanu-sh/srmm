@@ -16,11 +16,11 @@ const courseSchema = new mongoose.Schema(
     },
     course_fee: {
       type: Number,
-      required: true,
+      default: 0,
     },
     year: {
       type: Number,
-      required: true,
+      default: 1,
     },
   },
   {

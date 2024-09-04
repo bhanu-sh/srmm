@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
+import { numberToRoman } from "@/helpers/numberToRoman";
 
 export default function AddStudent() {
   const { data: session } = useSession();
@@ -153,7 +154,7 @@ export default function AddStudent() {
                 {course.length > 0 ? (
                   course.map((course: any) => (
                     <option key={course._id} value={course._id}>
-                      {course.name} (Session: {course.session_start} -{" "}
+                      {course.name} Year {numberToRoman(course.year)} (Session: {course.session_start} -{" "}
                       {course.session_end})
                     </option>
                   ))
@@ -165,7 +166,7 @@ export default function AddStudent() {
           </div>
           <label htmlFor="roll">Roll Number</label>
           <div className="flex flex-row items-center rounded-md">
-            <span className="font-bold pb-4 mr-1">SRMM{selectedCourse}</span>
+            <span className="font-bold pb-4 mr-1">{`SRMM${selectedCourse?.split(" ")[0].replace(/\s/g, "").replace(/\./g, "").toUpperCase()}`}</span>
             <input
               placeholder="Roll Number"
               className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"

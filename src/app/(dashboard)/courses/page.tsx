@@ -3,6 +3,7 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { numberToRoman } from "@/helpers/numberToRoman";
 import { useSession } from "next-auth/react";
 import {
   Dialog,
@@ -32,6 +33,7 @@ export default function CoursesPage() {
   const { data: session } = useSession();
 
   const [courses, setCourses] = useState([]);
+  const [romanNumeral, setRomanNumeral] = useState("");
   const [updatedCourse, setUpdatedCourse] = useState({
     _id: "",
     name: "",
@@ -68,6 +70,8 @@ export default function CoursesPage() {
         name: addedCourse.name,
         session_start: addedCourse.session_start,
         session_end: addedCourse.session_end,
+        course_fee: addedCourse.course_fee,
+        year: addedCourse.year,
       });
       handleFetchData();
       toast.success("Course added successfully");
@@ -135,6 +139,9 @@ export default function CoursesPage() {
                 className="w-80 p-4 bg-green-100 rounded-lg shadow-md my-5"
               >
                 <h1 className="text-4xl font-semibold">{course.name}</h1>
+                <h2 className="text-xl font-semibold">
+                  Year {numberToRoman(course.year)}
+                </h2>
                 <h2 className="text-xl font-semibold">
                   Session: {course.session_start} - {course.session_end}
                 </h2>

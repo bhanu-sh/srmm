@@ -65,6 +65,7 @@ export default function PayFeePage() {
       const res = await axios.post("/api/fee/pay", updatedPayFee);
       console.log("Fee Paid", res.data);
       toast.success("Fee Paid");
+      fetchFees();
       setPayFee({ ...payFee, amount: "" });
     } catch (error: any) {
       console.error("Error paying fee:", error);

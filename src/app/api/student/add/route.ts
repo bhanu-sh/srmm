@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     console.log(courseName);
 
-    const newRoll = `SRMM${courseName?.split(" ")[0].toUpperCase()}${roll}`;
+    const newRoll = `SRMM${courseName?.split(" ")[0].replace(/\s/g, "").replace(/\./g, "").toUpperCase()}${roll}`;
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
