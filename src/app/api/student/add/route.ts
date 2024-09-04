@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     console.log(courseName);
 
-    const newRoll = `SRMM${courseName.toUpperCase()}${roll}`;
+    const newRoll = `SRMM${courseName?.split(" ")[0].toUpperCase()}${roll}`;
 
     // Check if Student already exists
     const student = await Student.findOne({ phone });
@@ -45,8 +45,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    
 
     // Hash password
     const salt = await bcrypt.genSalt(10);

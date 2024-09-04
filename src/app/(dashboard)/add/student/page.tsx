@@ -55,7 +55,7 @@ export default function AddStudent() {
       if (response.data && Array.isArray(response.data.data)) {
         setCourse(response.data.data);
         setStudent({ ...student, course: response.data.data[0]._id });
-        setSelectedCourse(response.data.data[0].name);
+        setSelectedCourse(response.data.data[0].name?.split(" ")[0]);
       } else {
         console.error("Unexpected response format:", response.data);
       }
@@ -146,7 +146,7 @@ export default function AddStudent() {
                 onChange={(e) => {
                   const selected = course.find((c) => c._id === e.target.value);
                   setStudent({ ...student, course: e.target.value });
-                  setSelectedCourse(selected?.name); // Set the selected course name
+                  setSelectedCourse(selected?.name?.split(" ")[0]); // Set the selected course name
                   console.log("Selected Course ID:", e.target.value);
                 }}
               >
@@ -197,6 +197,16 @@ export default function AddStudent() {
               setStudent({ ...student, name: e.target.value });
             }}
           />
+          <label htmlFor="phone">Phone</label>
+          <input
+            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
+            id="phone"
+            type="text"
+            required
+            value={student.phone}
+            placeholder="Phone"
+            onChange={(e) => setStudent({ ...student, phone: e.target.value })}
+          />
           <label htmlFor="father_name">Father&apos;s Name</label>
           <input
             className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
@@ -230,16 +240,6 @@ export default function AddStudent() {
             value={student.email}
             placeholder="Email"
             onChange={(e) => setStudent({ ...student, email: e.target.value })}
-          />
-          <label htmlFor="phone">Phone</label>
-          <input
-            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-            id="phone"
-            type="text"
-            required
-            value={student.phone}
-            placeholder="Phone"
-            onChange={(e) => setStudent({ ...student, phone: e.target.value })}
           />
           <label htmlFor="dob">Date of Birth</label>
           <input
