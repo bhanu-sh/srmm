@@ -120,13 +120,33 @@ export default function StudentTableFee({
 
   const exportToExcel = () => {
     const data = searchResults.map((item: any) => ({
-      "First Name": item.f_name,
-      "Last Name": item.l_name,
+      "Ledger No": item.roll_no,
+      Name: item.name,
+      "Father's Name": item.father_name,
       Phone: item.phone,
-      Email: item.email,
-      Course: item.course,
-      Session: item.session_start_year,
-      "Roll No": item.roll_no,
+      Session: `${item.course.session_start} - ${item.course.session_end}`,
+      "Total Fee": fee
+        .filter((fee: any) => fee.student_id._id === item._id)
+        .reduce(
+          (acc: number, curr: any) =>
+            curr.type === "fee" ? acc + curr.amount : acc,
+          0
+        ),
+      "Due Fee":
+        fee
+          .filter((fee: any) => fee.student_id._id === item._id)
+          .reduce(
+            (acc: number, curr: any) =>
+              curr.type === "fee" ? acc + curr.amount : acc,
+            0
+          ) -
+        fee
+          .filter((fee: any) => fee.student_id._id === item._id)
+          .reduce(
+            (acc: number, curr: any) =>
+              curr.type === "received" ? acc + curr.amount : acc,
+            0
+          ),
     }));
     jsonToExcel(data, `students - ${new Date().toLocaleDateString()}`);
   };
@@ -345,7 +365,7 @@ export default function StudentTableFee({
                   className="px-6 py-3 cursor-pointer bg-gray-50"
                   onClick={() => sortData("roll_no")}
                 >
-                  Roll No
+                  Ledger No
                 </th>
                 <th
                   scope="col"

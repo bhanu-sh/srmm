@@ -56,7 +56,7 @@ const TableHeader: React.FC<{ onSort: (key: string) => void }> = ({
         className="px-4 py-2 bg-blue-100 cursor-pointer"
         onClick={() => onSort("roll_no")}
       >
-        Roll Number
+        Ledger Number
       </th>
       <th className="px-4 py-2 bg-white">Student Name</th>
       <th className="px-4 py-2 bg-blue-100 cursor-pointer">Course</th>

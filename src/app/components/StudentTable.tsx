@@ -43,13 +43,12 @@ export default function StudentTable({
 
   const exportToExcel = () => {
     const data = searchResults.map((item: any) => ({
-      "First Name": item.f_name,
-      "Last Name": item.l_name,
+      "Name": item.name,
       Phone: item.phone,
       Email: item.email,
-      Course: item.course,
-      Session: item.session_start_year,
-      "Roll No": item.roll_no,
+      Course: item.course?.name,
+      Session: `${item.course?.session_start} - ${item.course?.session_end}`,
+      "Ledger No": item.roll_no,
     }));
     jsonToExcel(data, `students - ${new Date().toLocaleDateString()}`);
   };
@@ -278,7 +277,7 @@ export default function StudentTable({
                   className="px-6 py-3 cursor-pointer bg-gray-50"
                   onClick={() => sortData("roll_no")}
                 >
-                  Roll No
+                  Ledger No
                 </th>
                 <th
                   scope="col"
