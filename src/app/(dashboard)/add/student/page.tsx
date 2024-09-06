@@ -74,7 +74,23 @@ export default function AddStudent() {
       });
       console.log("Student Added Successfully", response.data);
       toast.success("Student Added");
-      router.push("/");
+      setStudent({
+        name: "",
+        father_name: "",
+        mother_name: "",
+        email: "",
+        phone: "",
+        dob: "",
+        gender: "",
+        address: "",
+        city: "",
+        state: "",
+        pincode: "",
+        roll: "",
+        aadhar: "",
+        course: "",
+        date_of_admission: new Date().toISOString().split("T")[0],
+      });
     } catch (error: any) {
       console.log("Adding failed", error.response.data.error);
     } finally {
@@ -154,8 +170,8 @@ export default function AddStudent() {
                 {course.length > 0 ? (
                   course.map((course: any) => (
                     <option key={course._id} value={course._id}>
-                      {course.name} Year {numberToRoman(course.year)} (Session: {course.session_start} -{" "}
-                      {course.session_end})
+                      {course.name} Year {numberToRoman(course.year)} (Session:{" "}
+                      {course.session_start} - {course.session_end})
                     </option>
                   ))
                 ) : (
@@ -164,11 +180,15 @@ export default function AddStudent() {
               </select>
             )}
           </div>
-          <label htmlFor="roll">Roll Number</label>
+          <label htmlFor="roll">Ledger Number</label>
           <div className="flex flex-row items-center rounded-md">
-            <span className="font-bold pb-4 mr-1">{`SRMM${selectedCourse?.split(" ")[0].replace(/\s/g, "").replace(/\./g, "").toUpperCase()}`}</span>
+            <span className="font-bold pb-4 mr-1">{`SRMM${selectedCourse
+              ?.split(" ")[0]
+              .replace(/\s/g, "")
+              .replace(/\./g, "")
+              .toUpperCase()}`}</span>
             <input
-              placeholder="Roll Number"
+              placeholder="Ledger Number"
               className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
               value={student.roll}
               onChange={(e) => setStudent({ ...student, roll: e.target.value })}
@@ -198,16 +218,6 @@ export default function AddStudent() {
               setStudent({ ...student, name: e.target.value });
             }}
           />
-          <label htmlFor="phone">Phone</label>
-          <input
-            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-            id="phone"
-            type="text"
-            required
-            value={student.phone}
-            placeholder="Phone"
-            onChange={(e) => setStudent({ ...student, phone: e.target.value })}
-          />
           <label htmlFor="father_name">Father&apos;s Name</label>
           <input
             className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
@@ -231,6 +241,16 @@ export default function AddStudent() {
             onChange={(e) => {
               setStudent({ ...student, mother_name: e.target.value });
             }}
+          />
+          <label htmlFor="phone">Phone</label>
+          <input
+            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
+            id="phone"
+            type="text"
+            required
+            value={student.phone}
+            placeholder="Phone"
+            onChange={(e) => setStudent({ ...student, phone: e.target.value })}
           />
           <label htmlFor="email">Email</label>
           <input

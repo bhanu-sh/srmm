@@ -19,6 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -29,6 +35,8 @@ export default function PayFeePage() {
   const [payFee, setPayFee] = useState({
     name: "Fee Payment",
     amount: "",
+    description: "",
+    date: new Date().toISOString().split("T")[0],
     method: "cash",
     student_id: "",
   });
@@ -66,7 +74,14 @@ export default function PayFeePage() {
       console.log("Fee Paid", res.data);
       toast.success("Fee Paid");
       fetchFees();
-      setPayFee({ ...payFee, amount: "" });
+      setPayFee({
+        name: "Fee Payment",
+        amount: "",
+        description: "",
+        date: new Date().toISOString().split("T")[0],
+        method: "cash",
+        student_id: "",
+      });
     } catch (error: any) {
       console.error("Error paying fee:", error);
       toast.error("Error paying fee");
@@ -86,7 +101,7 @@ export default function PayFeePage() {
         <div className="flex items-center border-2 border-gray-300 rounded-md px-2">
           <span className="font-bold">SRMM</span>
           <Input
-            placeholder="Search Student"
+            placeholder="Search by Ledger Number, Name, or Phone"
             className="border-0 active:ring-0 focus:ring-0 focus:outline-none active:outline-none focus:border-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-0 focus-visible:ring-offset-0 focus-visible:ring-offset-transparent focus-visible:border-transparent focus-visible:ring-transparent"
             value={search.toUpperCase()}
             onChange={(e) => setSearch(e.target.value.toLowerCase())}
@@ -95,55 +110,101 @@ export default function PayFeePage() {
         <div className="flex flex-col gap-2">
           {search &&
             students
-              .filter((student: any) =>
-                student?.roll_no?.toLowerCase().startsWith("srmm" + search)
-              )
+              .filter((student: any) => {
+                const searchText = search.toLowerCase();
+                return (
+                  student?.roll_no?.toLowerCase().startsWith("srmm" + searchText) ||
+                  student?.name?.toLowerCase().includes(searchText) ||
+                  student?.phone?.toLowerCase().includes(searchText)
+                );
+              })
               .map((student: any) => (
                 <div key={student._id} className="flex flex-col gap-2">
                   <div className="flex justify-between gap-4">
                     <div className="flex flex-col">
                       <p>
-                        <span className="font-bold">Name: </span>
-                        {student.name}
+                        <span className="font-bold">Ledger No: </span>
+                        {student.roll_no}
                       </p>
                       <p>
                         <span className="font-bold">Course: </span>
-                        <span>{student.course?.name}</span>
+                        {student.course?.name}
                       </p>
                       <p>
-                        <span className="font-bold">Roll No: </span>
-                        {student.roll_no}
+                        <span className="font-bold">Student Name: </span>
+                        {student.name}
+                      </p>
+                      <p>
+                        <span className="font-bold">Father Name: </span>
+                        {student.father_name}
+                      </p>
+                      <p>
+                        <span className="font-bold">Phone: </span>
+                        {student.phone}
+                      </p>
+                      <p>
+                        <span className="font-bold">Date of Admission: </span>
+                        {student.date_of_admission
+                          ? new Date(student.date_of_admission).toDateString()
+                          : ""}
                       </p>
                       <p>
                         <span className="font-bold">Pending Fees: </span>{" "}
                         &#8377;
-                        {
-                          //reduced received fee from total fee
-                          (
-                            fees
-                              .filter(
-                                (fee: any) => fee.student_id._id === student._id
-                              )
-                              .reduce(
-                                (acc: number, curr: any) =>
-                                  curr.type === "fee" ? acc + curr.amount : acc,
-                                0
-                              ) -
-                            fees
-                              .filter(
-                                (fee: any) => fee.student_id._id === student._id
-                              )
-                              .reduce(
-                                (acc: number, curr: any) =>
-                                  curr.type === "received"
-                                    ? acc + curr.amount
-                                    : acc,
-                                0
-                              )
-                          ).toFixed(2)
-                        }
+                        {(
+                          fees
+                            .filter(
+                              (fee: any) => fee.student_id._id === student._id
+                            )
+                            .reduce(
+                              (acc: number, curr: any) =>
+                                curr.type === "fee" ? acc + curr.amount : acc,
+                              0
+                            ) -
+                          fees
+                            .filter(
+                              (fee: any) => fee.student_id._id === student._id
+                            )
+                            .reduce(
+                              (acc: number, curr: any) =>
+                                curr.type === "received"
+                                  ? acc + curr.amount
+                                  : acc,
+                              0
+                            )
+                        ).toFixed(2)}
                       </p>
+                      <div>
+                        <Accordion type="single" collapsible>
+                          <AccordionItem value="item-1">
+                            <AccordionTrigger>
+                              <p className="font-bold">Previous Payments:</p>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {fees
+                                .filter(
+                                  (fee: any) =>
+                                    fee.student_id._id === student._id &&
+                                    fee.type === "received"
+                                )
+                                .map((fee: any, index: number) => (
+                                  <div className="mb-4" key={index}>
+                                    <p>
+                                      Date: {new Date(fee.date).toDateString()}
+                                    </p>
+                                    <p>Amount: &#8377;{fee.amount}</p>
+                                    <p>Method: {fee.method}</p>
+                                    {fee.description && (
+                                      <p>Description: {fee.description}</p>
+                                    )}
+                                  </div>
+                                ))}
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      </div>
                     </div>
+
                     <Dialog>
                       <DialogTrigger>
                         <Button variant={"success"}>Pay Fee</Button>
@@ -179,6 +240,26 @@ export default function PayFeePage() {
                                 </SelectContent>
                               </Select>
                               <Input
+                                placeholder="Description"
+                                onChange={(e) =>
+                                  setPayFee({
+                                    ...payFee,
+                                    description: e.target.value,
+                                  })
+                                }
+                              />
+                              <Input
+                                placeholder="Date"
+                                type="date"
+                                value={payFee.date}
+                                onChange={(e) =>
+                                  setPayFee({
+                                    ...payFee,
+                                    date: e.target.value,
+                                  })
+                                }
+                              />
+                              <Input
                                 placeholder="Amount"
                                 onChange={(e) =>
                                   setPayFee({
@@ -186,6 +267,11 @@ export default function PayFeePage() {
                                     amount: e.target.value,
                                   })
                                 }
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    payingFee(student._id);
+                                  }
+                                }}
                               />
                               <DialogClose className="w-6 mx-auto">
                                 <Button

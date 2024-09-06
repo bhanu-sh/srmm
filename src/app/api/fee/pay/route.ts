@@ -8,7 +8,7 @@ connect();
 export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
-    const { name, method, amount, student_id } = reqBody;
+    const { name, date, description, method, amount, student_id } = reqBody;
 
     console.log(reqBody);
 
@@ -26,6 +26,8 @@ export async function POST(request: NextRequest) {
       method,
       type: "received",
       amount,
+      date,
+      description,
       receipt_no,
       student_id,
     });

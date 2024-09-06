@@ -5,6 +5,18 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Fee {
   _id: string;
@@ -35,6 +47,17 @@ const formatCurrency = (amount: number) => {
     currency: "INR",
     minimumFractionDigits: 2,
   }).format(amount);
+};
+
+const deleteFee = async (id: string) => {
+  try {
+    await axios.post(`/api/fee/delete`, { fee_id: id });
+    toast.success("Fee deleted successfully");
+    fetchFees();
+  } catch (error: any) {
+    console.error("Error deleting fee", error);
+    toast.error("Error deleting fee");
+  }
 };
 
 const TableHeader: React.FC<{ onSort: (key: string) => void }> = ({
@@ -214,6 +237,31 @@ const FeesPage: React.FC = () => {
                     <Link href={`/fees/${fee._id}`}>
                       <Button variant={"link"}>View</Button>
                     </Link>
+                    <AlertDialog>
+                      <AlertDialogTrigger>
+                        <Button className="text-red-600" variant={"link"}>
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete this student and remove all related data from
+                            our servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => deleteFee(fee._id)}>
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </td>
                 </tr>
               ))}
