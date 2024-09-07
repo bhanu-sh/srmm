@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/accordion";
 import axios from "axios";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 export default function PayFeePage() {
   const [students, setStudents] = useState<any[]>([]);
@@ -96,6 +97,10 @@ export default function PayFeePage() {
   return (
     <div>
       <h1 className="text-4xl text-center font-semibold">Pay Fee</h1>
+      <hr className="h-0.5 my-2 border-0 rounded bg-gray-300" />
+      <Link href="/fees/pay/bulk">
+        <Button variant={"link"}>Bulk Pay Fee</Button>
+      </Link>
       <div className="flex flex-col gap-2 justify-center">
         <p className="text-2xl">Search for Student</p>
         <div className="flex items-center border-2 border-gray-300 rounded-md px-2">
@@ -113,7 +118,9 @@ export default function PayFeePage() {
               .filter((student: any) => {
                 const searchText = search.toLowerCase();
                 return (
-                  student?.roll_no?.toLowerCase().startsWith("srmm" + searchText) ||
+                  student?.roll_no
+                    ?.toLowerCase()
+                    .startsWith("srmm" + searchText) ||
                   student?.name?.toLowerCase().includes(searchText) ||
                   student?.phone?.toLowerCase().includes(searchText)
                 );
