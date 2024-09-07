@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
       aadhar,
       course,
       date_of_admission,
+      fee_submitted,
     } = reqBody;
 
     console.log(reqBody);
@@ -34,7 +35,11 @@ export async function POST(request: NextRequest) {
 
     console.log(courseName);
 
-    const newRoll = `SRMM${courseName?.split(" ")[0].replace(/\s/g, "").replace(/\./g, "").toUpperCase()}${roll}`;
+    const newRoll = `SRMM${courseName
+      ?.split(" ")[0]
+      .replace(/\s/g, "")
+      .replace(/\./g, "")
+      .toUpperCase()}${roll}`;
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
@@ -73,6 +78,17 @@ export async function POST(request: NextRequest) {
       student_id: savedStudent._id,
     });
     await newCourseFee.save();
+
+    const newAdmissionFee = new Fee({
+      name: "Admission Fee",
+      description: "Admission Fee",
+      amount: fee_submitted,
+      type: "received",
+      receipt_no: course_receipt_no + 1,
+      student_id: savedStudent._id,
+    });
+
+    await newAdmissionFee.save();
 
     savedStudent.fees.push(newCourseFee._id);
 

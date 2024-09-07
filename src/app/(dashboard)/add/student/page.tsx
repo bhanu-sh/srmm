@@ -28,6 +28,7 @@ export default function AddStudent() {
     aadhar: "",
     course: "",
     date_of_admission: new Date().toISOString().split("T")[0],
+    fee_submitted: 0,
   });
   const [collegeLock, setCollegeLock] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
@@ -90,6 +91,7 @@ export default function AddStudent() {
         aadhar: "",
         course: "",
         date_of_admission: new Date().toISOString().split("T")[0],
+        fee_submitted: 0,
       });
     } catch (error: any) {
       console.log("Adding failed", error.response.data.error);
@@ -251,6 +253,20 @@ export default function AddStudent() {
             value={student.phone}
             placeholder="Phone"
             onChange={(e) => setStudent({ ...student, phone: e.target.value })}
+          />
+          <label htmlFor="phone">Fee Submitting</label>
+          <input
+            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
+            id="fee_submitted"
+            type="number"
+            required
+            placeholder="Fee Submitting"
+            onChange={(e) =>
+              setStudent({
+                ...student,
+                fee_submitted: parseInt(e.target.value, 10),
+              })
+            }
           />
           <label htmlFor="email">Email</label>
           <input

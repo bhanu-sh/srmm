@@ -1,16 +1,14 @@
 import { connect } from "@/dbConfig/dbConfig";
-import { Student } from "@/models";
+import { Student, Course } from "@/models";
 import { Fee } from "@/models";
-import { Course } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
-export async function POST(request: NextRequest) {
-  await connect();
+connect();
 
+export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
-    console.log("Request body:", reqBody);
     const { user, course_id } = reqBody;
 
     if (!Array.isArray(user) || user.length === 0) {
@@ -20,11 +18,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const checkCourse = await Course.findOne({ _id: course_id });
-
+    const checkCourse = await Course.findById(course_id);
     if (!checkCourse) {
       return NextResponse.json({ error: "Course not found" }, { status: 404 });
     }
+
+    const courseName = checkCourse.name;
 
     const results = [];
 
@@ -40,15 +39,14 @@ export async function POST(request: NextRequest) {
         address,
         city,
         state,
-        pincode,
         password,
         roll,
         aadhar,
-        course_fee,
+        date_of_admission,
+        fee_submitted,
       } = student;
 
       try {
-        // Validate phone and password
         if (
           !phone ||
           typeof phone !== "string" ||
@@ -60,13 +58,26 @@ export async function POST(request: NextRequest) {
             status: "error",
             message: "Invalid phone or password format",
           });
-          console.log("Invalid phone or password format");
           continue;
         }
+
+        // Generate roll number based on course
+        const newRoll = `SRMM${courseName
+          .split(" ")[0]
+          .replace(/\s/g, "")
+          .replace(/\./g, "")
+          .toUpperCase()}${roll}`;
 
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
+
+        const [day, month, year] = date_of_admission.split("/");
+        const parsedDateOfAdmission = new Date(
+          parseInt(year),
+          parseInt(month) - 1,
+          parseInt(day)
+        );
 
         // Create new student
         const newStudent = new Student({
@@ -80,32 +91,50 @@ export async function POST(request: NextRequest) {
           address,
           city,
           state,
-          pincode,
           password: hashedPassword,
           role: "Student",
-          roll_no: roll,
+          roll_no: newRoll,
           aadhar,
           course: course_id,
+          date_of_admission: parsedDateOfAdmission,
         });
 
-        // Save Student
+        // Save student
         const savedStudent = await newStudent.save();
 
-        const receipt_no = (await Fee.countDocuments({})) + 1;
+        console.log("Saved student:", savedStudent);
 
+        // Generate receipt number and create course fee
+        const receipt_no = (await Fee.countDocuments({})) + 1;
         const newFee = new Fee({
           name: "Course Fee",
           description: "Course Fee",
-          amount: course_fee,
+          amount: checkCourse.course_fee,
           type: "fee",
-          receipt_no: receipt_no,
+          receipt_no,
           student_id: savedStudent._id,
         });
 
         await newFee.save();
 
-        newStudent.fees.push(newFee._id);
-        await newStudent.save();
+        // Create admission fee
+        const newAdmissionFee = new Fee({
+          name: "Admission Fee",
+          description: "Admission Fee",
+          amount: fee_submitted,
+          type: "received",
+          receipt_no: receipt_no + 1,
+          student_id: savedStudent._id,
+        });
+
+        await newAdmissionFee.save();
+
+        savedStudent.fees.push(newFee._id);
+        await savedStudent.save();
+
+        // Associate student with course
+        checkCourse.students.push(savedStudent._id);
+        await checkCourse.save();
 
         results.push({
           phone,
@@ -113,22 +142,12 @@ export async function POST(request: NextRequest) {
           message: "Student created successfully",
           savedStudent,
         });
-
-        const CourseDetails = await Course.findOne({ _id: course_id });
-        CourseDetails.students.push(savedStudent._id);
-        await CourseDetails.save();
       } catch (error: any) {
-        if (error instanceof Error) {
-          results.push({ phone, status: "error", message: error.message });
-          console.error(error.message);
-        } else {
-          results.push({
-            phone,
-            status: "error",
-            message: "An unknown error occurred",
-          });
-          console.error("An unknown error occurred");
-        }
+        results.push({
+          phone,
+          status: "error",
+          message: error.message,
+        });
       }
     }
 
@@ -138,10 +157,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: any) {
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error ? error.message : "An unknown error occurred",
-      },
+      { error: error.message || "An unknown error occurred" },
       { status: 500 }
     );
   }
