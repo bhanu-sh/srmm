@@ -2,11 +2,21 @@ import { connect } from "@/dbConfig/dbConfig";
 import { Student } from "@/models";
 import { Course } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-connect();
 
 export async function PUT(request: NextRequest) {
+  connect();
+
   try {
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const reqBody = await request.json();
     const { _id, ...rest } = reqBody;
 

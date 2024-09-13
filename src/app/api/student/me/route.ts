@@ -5,9 +5,9 @@ import { getToken } from "next-auth/jwt";
 
 const secret = process.env.NEXTAUTH_SECRET;
 
-connect();
-
 export async function GET(request: NextRequest) {
+  connect();
+
   try {
     const token = await getToken({ req: request, secret });
     if (!token) {

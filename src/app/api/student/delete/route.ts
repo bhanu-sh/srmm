@@ -3,11 +3,20 @@ import Student from "@/models/studentModel";
 import Fee from "@/models/feeModel";
 import Course from "@/models/courseModel";
 import { NextRequest, NextResponse } from "next/server";
-
-connect();
+import { getToken } from "next-auth/jwt";
 
 export async function POST(request: NextRequest) {
+  connect();
+
   try {
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const reqBody = await request.json();
     console.log("Request body:", reqBody);
     const { user } = reqBody;
