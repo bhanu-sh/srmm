@@ -17,6 +17,22 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+interface Student {
+  name: string;
+  dob: string;
+  phone: string;
+  email: string;
+  course: { name: string; session_start: string; session_end: string };
+  roll_no: string;
+  date_of_admission: string;
+  [key: string]: any; // This allows access to other keys dynamically
+}
+
+interface SortConfig {
+  key: keyof Student | ""; // Ensures key matches Student properties
+  direction: "asc" | "desc";
+}
+
 export default function StudentTable({
   role,
   lock,
@@ -113,15 +129,33 @@ export default function StudentTable({
     setSearchResults(results);
   };
 
-  const sortData = (key: string) => {
-    let direction = "asc";
+  const sortData = (key: keyof Student) => {
+    let direction: "asc" | "desc" = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
-
+  
     setSortConfig({ key, direction });
-
-    const sortedData = [...searchResults].sort((a, b) => {
+  
+    const sortedData = [...searchResults].sort((a: Student, b: Student) => {
+      // Handle roll_no sorting for different formats
+      if (key === "roll_no") {
+        // Extract the prefix (e.g., SRMMBAI, SRMMBSCI) and the numeric part
+        const [prefixA, numA] = a.roll_no.match(/([A-Z]+)(\d+)/)?.slice(1) || [];
+        const [prefixB, numB] = b.roll_no.match(/([A-Z]+)(\d+)/)?.slice(1) || [];
+  
+        if (prefixA === prefixB) {
+          // If prefixes are the same, sort by the numeric part
+          const numAInt = parseInt(numA, 10);
+          const numBInt = parseInt(numB, 10);
+          return direction === "asc" ? numAInt - numBInt : numBInt - numAInt;
+        }
+  
+        // If prefixes are different, sort by the prefix alphabetically
+        return direction === "asc" ? prefixA.localeCompare(prefixB) : prefixB.localeCompare(prefixA);
+      }
+  
+      // General sorting logic for other fields
       if (a[key] < b[key]) {
         return direction === "asc" ? -1 : 1;
       }
@@ -130,7 +164,7 @@ export default function StudentTable({
       }
       return 0;
     });
-
+  
     setSearchResults(sortedData);
   };
 

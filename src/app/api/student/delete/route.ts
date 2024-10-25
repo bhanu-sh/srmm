@@ -18,7 +18,6 @@ export async function POST(request: NextRequest) {
     }
 
     const reqBody = await request.json();
-    console.log("Request body:", reqBody);
     const { user } = reqBody;
 
     if (!Array.isArray(user) || user.length === 0) {
@@ -29,46 +28,53 @@ export async function POST(request: NextRequest) {
     }
 
     const results = [];
+    const batchSize = 50; // Customize batch size to suit your server's limits
 
-    for (const user_id of user) {
-      try {
-        const userExist = await Student.findOne({ _id: user_id });
+    for (let i = 0; i < user.length; i += batchSize) {
+      const batch = user.slice(i, i + batchSize);
 
-        if (!userExist) {
-          results.push({
-            user_id,
-            status: "error",
-            message: "User does not exist",
-          });
-          continue;
-        }
+      const batchResults = await Promise.all(
+        batch.map(async (user_id) => {
+          try {
+            const userExist = await Student.findById(user_id);
 
-        //delete fee records of the student
-        await Fee.deleteMany({ student_id: user_id });
+            if (!userExist) {
+              return {
+                user_id,
+                status: "error",
+                message: "User does not exist",
+              };
+            }
 
-        const courses = await Course.find({ students: user_id });
-        for (const course of courses) {
-          course.students = course.students.filter(
-            (student_id: { toString: () => any }) =>
-              student_id.toString() !== user_id
-          );
-          await course.save();
-        }
+            // Delete fee records associated with the student
+            await Fee.deleteMany({ student_id: user_id });
 
-        await Student.deleteOne({ _id: user_id });
+            // Remove the student from all enrolled courses
+            const courses = await Course.find({ students: user_id });
+            await Promise.all(
+              courses.map(async (course) => {
+                course.students = course.students.filter(
+                  (student_id: { toString: () => any; }) => student_id.toString() !== user_id
+                );
+                await course.save();
+              })
+            );
 
-        results.push({
-          user_id,
-          status: "success",
-          message: "User deleted successfully",
-        });
-      } catch (error: any) {
-        results.push({
-          user_id,
-          status: "error",
-          message: error.message,
-        });
-      }
+            // Delete the student record
+            await Student.deleteOne({ _id: user_id });
+
+            return {
+              user_id,
+              status: "success",
+              message: "User deleted successfully",
+            };
+          } catch (error: any) {
+            return { user_id, status: "error", message: error.message };
+          }
+        })
+      );
+
+      results.push(...batchResults); // Collect results for the batch
     }
 
     return NextResponse.json({ data: results });

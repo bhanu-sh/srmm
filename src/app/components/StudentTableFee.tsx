@@ -28,6 +28,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+interface Student {
+  name: string;
+  dob: string;
+  phone: string;
+  email: string;
+  course: { name: string; session_start: string; session_end: string };
+  roll_no: string;
+  date_of_admission: string;
+  [key: string]: any; // This allows access to other keys dynamically
+}
+
+interface SortConfig {
+  key: string; // Change to string to avoid type error
+  direction: "asc" | "desc";
+}
+
 export default function StudentTableFee({
   collegeId,
   role,
@@ -51,19 +67,18 @@ export default function StudentTableFee({
     name: "",
     amount: 0,
   });
+  const [courseName, setCourseName] = useState("");
 
   const getStudents = async () => {
     try {
       console.log(collegeId);
       const response = await axios.get(`/api/student/getall`);
-      console.log(response.data.data);
       const filteredUser = response.data.data.filter(
         (user: any) => user.course._id === courseId
       );
 
       setUser(filteredUser);
       setSearchResults(filteredUser);
-      console.log(filteredUser);
     } catch (error: any) {
       console.log("Error", error.response.data.error);
     }
@@ -75,8 +90,8 @@ export default function StudentTableFee({
       const course = response.data.data.find(
         (course: any) => course._id === courseId
       );
+      setCourseName(course.name);
       getStudents();
-      console.log(course);
     } catch (error: any) {
       console.log("Error", error.response.data.error);
     }
@@ -211,14 +226,22 @@ export default function StudentTableFee({
   };
 
   const sortData = (key: string) => {
-    let direction = "asc";
+    let direction: "asc" | "desc" = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
 
-    setSortConfig({ key, direction });
+    setSortConfig({ key: key as string, direction });
 
-    const sortedData = [...searchResults].sort((a, b) => {
+    const sortedData = [...searchResults].sort((a: Student, b: Student) => {
+      // Specific sorting logic for roll_no to handle alphanumeric values
+      if (key === "roll_no") {
+        const numA = parseInt(a.roll_no.match(/\d+/)?.[0] || "0", 10);
+        const numB = parseInt(b.roll_no.match(/\d+/)?.[0] || "0", 10);
+        return direction === "asc" ? numA - numB : numB - numA;
+      }
+
+      // General sorting logic for other fields
       if (a[key] < b[key]) {
         return direction === "asc" ? -1 : 1;
       }
@@ -247,7 +270,7 @@ export default function StudentTableFee({
     <>
       <div className="flex flex-col justify-center">
         <h1 className="text-2xl font-bold text-gray-700 text-center">
-          Students
+          {courseName} Students
         </h1>
         <div className="flex justify-between mb-4">
           <Dialog>
@@ -258,7 +281,7 @@ export default function StudentTableFee({
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add Expense</DialogTitle>
+                <DialogTitle>Add Fee for {courseName} Students</DialogTitle>
                 <DialogDescription>
                   <div className="flex flex-col gap-2 justify-center">
                     <Label htmlFor="name">Fee Name *</Label>
@@ -342,7 +365,17 @@ export default function StudentTableFee({
             </button>
           </span>
         </div>
-
+        <div className="flex justify-between">
+          <p className="text-lg font-semibold">
+            Selected Students {selected.length}
+          </p>
+          <p className="text-lg font-semibold">
+            Total Students {searchResults.length}
+          </p>
+        </div>
+        <h2 className="font-semibold text-2xl mt-2 mb-4">
+          Total Fee: {totalFee} | Due Fee: {dueFee}
+        </h2>
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
             <thead className="text-xs text-gray-700 uppercase">
@@ -424,7 +457,7 @@ export default function StudentTableFee({
                   </td>
                   <td className="px-6 py-4">
                     {fee
-                      .filter((fee: any) => fee.student_id._id === user._id)
+                      .filter((fee: any) => fee?.student_id?._id === user?._id)
                       .reduce(
                         (acc: number, curr: any) =>
                           curr.type === "fee" ? acc + curr.amount : acc,
@@ -435,14 +468,16 @@ export default function StudentTableFee({
                     {
                       //reduced received fee from total fee
                       fee
-                        .filter((fee: any) => fee.student_id._id === user._id)
+                        ?.filter((fee: any) => fee.student_id._id === user._id)
                         .reduce(
                           (acc: number, curr: any) =>
                             curr.type === "fee" ? acc + curr.amount : acc,
                           0
                         ) -
                         fee
-                          .filter((fee: any) => fee.student_id._id === user._id)
+                          ?.filter(
+                            (fee: any) => fee.student_id._id === user._id
+                          )
                           .reduce(
                             (acc: number, curr: any) =>
                               curr.type === "received"
@@ -500,9 +535,6 @@ export default function StudentTableFee({
               ))}
             </tbody>
           </table>
-          <h2 className="font-semibold text-2xl mt-2 mb-4">
-            Total Fee: {totalFee} | Due Fee: {dueFee}
-          </h2>
         </div>
       </div>
     </>

@@ -23,8 +23,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Course not found" }, { status: 404 });
     }
 
-    const courseName = checkCourse.name;
+    // Ensure students is initialized as an array
+    if (!Array.isArray(checkCourse.students)) {
+      checkCourse.students = [];
+    }
 
+    const courseName = checkCourse.name;
     const results = [];
 
     for (const student of user) {
@@ -47,12 +51,7 @@ export async function POST(request: NextRequest) {
       } = student;
 
       try {
-        if (
-          !phone ||
-          typeof phone !== "string" ||
-          !password ||
-          typeof password !== "string"
-        ) {
+        if (!phone || typeof phone !== "string" || !password || typeof password !== "string") {
           results.push({
             phone,
             status: "error",
@@ -61,22 +60,31 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // Generate roll number based on course
-        const newRoll = `SRMM${courseName
-          .split(" ")[0]
-          .replace(/\s/g, "")
-          .replace(/\./g, "")
-          .toUpperCase()}${roll}`;
+        // Check if dob and date_of_admission are defined
+        if (!dob || !date_of_admission) {
+          results.push({ phone, status: "error", message: "Date of birth or admission date is missing" });
+          continue;
+        }
 
-        // Hash password
+        const newRoll = `SRMM${courseName.split(" ")[0].replace(/\s/g, "").replace(/\./g, "").toUpperCase()}${roll}`;
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const [day, month, year] = date_of_admission.split("/");
+        // Parse date_of_admission from "dd/mm/yyyy"
+        const [admissionDay, admissionMonth, admissionYear] = date_of_admission.split("/");
         const parsedDateOfAdmission = new Date(
-          parseInt(year),
-          parseInt(month) - 1,
-          parseInt(day)
+          parseInt(admissionYear),
+          parseInt(admissionMonth) - 1,
+          parseInt(admissionDay)
+        );
+
+        // Parse dob from "dd/mm/yyyy"
+        const [dobDay, dobMonth, dobYear] = dob.split("/");
+        const parsedDob = new Date(
+          parseInt(dobYear),
+          parseInt(dobMonth) - 1,
+          parseInt(dobDay)
         );
 
         // Create new student
@@ -86,7 +94,7 @@ export async function POST(request: NextRequest) {
           mother_name,
           email,
           phone,
-          dob,
+          dob: parsedDob,
           gender,
           address,
           city,
@@ -99,13 +107,13 @@ export async function POST(request: NextRequest) {
           date_of_admission: parsedDateOfAdmission,
         });
 
-        // Save student
+        // Save student and wait for completion
         const savedStudent = await newStudent.save();
 
-        console.log("Saved student:", savedStudent);
-
-        // Generate receipt number and create course fee
+        // Generate receipt number for fees
         const receipt_no = (await Fee.countDocuments({})) + 1;
+
+        // Create course fee
         const newFee = new Fee({
           name: "Course Fee",
           description: "Course Fee",
@@ -115,6 +123,7 @@ export async function POST(request: NextRequest) {
           student_id: savedStudent._id,
         });
 
+        // Save course fee
         await newFee.save();
 
         // Create admission fee
@@ -127,14 +136,16 @@ export async function POST(request: NextRequest) {
           student_id: savedStudent._id,
         });
 
+        // Save admission fee
         await newAdmissionFee.save();
 
+        // Update student's fees array in a separate operation
         savedStudent.fees.push(newFee._id);
-        await savedStudent.save();
+        await savedStudent.save(); // Await the save
 
-        // Associate student with course
+        // Push student ID to course
         checkCourse.students.push(savedStudent._id);
-        await checkCourse.save();
+        await checkCourse.save(); // Await the save
 
         results.push({
           phone,
@@ -143,6 +154,7 @@ export async function POST(request: NextRequest) {
           savedStudent,
         });
       } catch (error: any) {
+        console.error(`Error processing student with phone ${phone}:`, error.message);
         results.push({
           phone,
           status: "error",
@@ -156,6 +168,7 @@ export async function POST(request: NextRequest) {
       results,
     });
   } catch (error: any) {
+    console.error("Error in main try block:", error.message);
     return NextResponse.json(
       { error: error.message || "An unknown error occurred" },
       { status: 500 }
