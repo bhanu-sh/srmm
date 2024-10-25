@@ -44,7 +44,10 @@ export default function StudentTable({
   const [selected, setSelected] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    key: "",
+    direction: "asc",
+  });
 
   const getStudents = async () => {
     try {
@@ -59,7 +62,7 @@ export default function StudentTable({
 
   const exportToExcel = () => {
     const data = searchResults.map((item: any) => ({
-      "Name": item.name,
+      Name: item.name,
       Phone: item.phone,
       Email: item.email,
       Course: item.course?.name,
@@ -134,27 +137,31 @@ export default function StudentTable({
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
-  
+
     setSortConfig({ key, direction });
-  
+
     const sortedData = [...searchResults].sort((a: Student, b: Student) => {
       // Handle roll_no sorting for different formats
       if (key === "roll_no") {
         // Extract the prefix (e.g., SRMMBAI, SRMMBSCI) and the numeric part
-        const [prefixA, numA] = a.roll_no.match(/([A-Z]+)(\d+)/)?.slice(1) || [];
-        const [prefixB, numB] = b.roll_no.match(/([A-Z]+)(\d+)/)?.slice(1) || [];
-  
+        const [prefixA, numA] =
+          a.roll_no.match(/([A-Z]+)(\d+)/)?.slice(1) || [];
+        const [prefixB, numB] =
+          b.roll_no.match(/([A-Z]+)(\d+)/)?.slice(1) || [];
+
         if (prefixA === prefixB) {
           // If prefixes are the same, sort by the numeric part
           const numAInt = parseInt(numA, 10);
           const numBInt = parseInt(numB, 10);
           return direction === "asc" ? numAInt - numBInt : numBInt - numAInt;
         }
-  
+
         // If prefixes are different, sort by the prefix alphabetically
-        return direction === "asc" ? prefixA.localeCompare(prefixB) : prefixB.localeCompare(prefixA);
+        return direction === "asc"
+          ? prefixA.localeCompare(prefixB)
+          : prefixB.localeCompare(prefixA);
       }
-  
+
       // General sorting logic for other fields
       if (a[key] < b[key]) {
         return direction === "asc" ? -1 : 1;
@@ -164,7 +171,7 @@ export default function StudentTable({
       }
       return 0;
     });
-  
+
     setSearchResults(sortedData);
   };
 
